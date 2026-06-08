@@ -609,9 +609,9 @@ export default function App() {
           </div>
 
           <div className="md:col-span-5 flex justify-center relative">
-            <div className="absolute inset-0 bg-gradient-to-tr from-rose-200 to-amber-200 blur-3xl opacity-40 rounded-[2rem]"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-rose-200 to-amber-200 blur-3xl opacity-40 rounded-full"></div>
             <div className="relative">
-              <div className="w-64 h-64 sm:w-80 sm:h-80 rounded-[2rem] border-8 border-white shadow-2xl overflow-hidden bg-orange-100 flex items-center justify-center">
+              <div className="w-64 h-64 sm:w-80 sm:h-80 rounded-full border-8 border-white shadow-2xl overflow-hidden bg-orange-100 flex items-center justify-center">
                 <img 
                   src="/images/Main.jpg" 
                   alt="Velvet Crumbs Baking Showcase" 
