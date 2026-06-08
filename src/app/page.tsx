@@ -18,9 +18,9 @@ import {
 
 // Unified Cookie list with your exact descriptions and specified ingredients
 const COOKIES = [
-    { 
+  { 
     id: 'choc',
-    img: 'https://images.unsplash.com/photo-1558961309-db6f1a3eb32e?auto=format&fit=crop&q=80&w=600', 
+    img: '/images/1.Chochlate_Indulgence.jpg', 
     price: 3.99, 
     origPrice: 4.50, 
     special: false,
@@ -35,9 +35,9 @@ const COOKIES = [
       fi: ['Kananmuna', 'Vehnä', 'Maito', 'Hasselpähkinä'] 
     }
   },
-   { 
+  { 
     id: 'nutella',
-    img: 'https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&q=80&w=600', 
+    img: '/images/1.Nutella_choch_chip.jpg', 
     price: 3.99, 
     origPrice: 4.50, 
     special: false,
@@ -52,10 +52,9 @@ const COOKIES = [
       fi: ['Kananmuna', 'Vehnä', 'Maito', 'Hasselpähkinä'] 
     }
   },
-
   { 
     id: 'lotus',
-    img: 'https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&q=80&w=600', 
+    img: '/images/1.Lotus_Gold.png', 
     price: 3.99, 
     origPrice: 4.50, 
     special: false,
@@ -70,10 +69,9 @@ const COOKIES = [
       fi: ['Kananmuna', 'Vehnä', 'Maito'] 
     }
   },
-
   { 
     id: 'ruby',
-    img: 'https://images.unsplash.com/photo-1618922891157-ff1ec9be5967?auto=format&fit=crop&q=80&w=600', 
+    img: '/images/1.Ruby_Velvet_Bliss.jpg', 
     price: 3.99, 
     origPrice: 4.50, 
     special: false,
@@ -88,11 +86,9 @@ const COOKIES = [
       fi: ['Kananmuna', 'Vehnä', 'Maito', 'Milk', 'Elintarvikeväri'] 
     }
   },
- 
-
   { 
     id: 'carrot',
-    img: 'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&q=80&w=600', 
+    img: '/images/1.Carrot_Cake_cookie.jpg', 
     price: 3.99, 
     origPrice: 4.50, 
     special: false,
@@ -107,10 +103,9 @@ const COOKIES = [
       fi: ['Kananmuna', 'Vehnä', 'Maito', 'Saksanpähkinä'] 
     }
   },
-  
   { 
     id: 'peanut',
-    img: 'https://images.unsplash.com/photo-1558961309-db6f1a3eb32e?auto=format&fit=crop&q=80&w=600', 
+    img: '/images/1.Peanut_Dusk.jpg', 
     price: 3.99, 
     origPrice: 4.50, 
     special: false,
@@ -127,7 +122,7 @@ const COOKIES = [
   },
   { 
     id: 'jam',
-    img: 'https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?auto=format&fit=crop&q=80&w=600', 
+    img: '/images/1.Jam_swirl.jpg', 
     price: 3.99, 
     origPrice: 4.50, 
     special: false,
@@ -144,7 +139,7 @@ const COOKIES = [
   },
   { 
     id: 'funfetti',
-    img: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?auto=format&fit=crop&q=80&w=600', 
+    img: '/images/1.Funfetti_surprise.jpg', 
     price: 0, 
     origPrice: 0, 
     special: true,
@@ -209,7 +204,7 @@ const TRANSLATIONS = {
     slotAfternoon: "Afternoon (14:00 – 17:00)",
     slotEvening: "Evening (17:00 – 20:00)",
     secDiet: "4. Special Requests & Dietaries",
-    dietSub: "List lactose-free wishes, packaging needs, or gift card greetings here",
+    dietSub: "List any dietary reservations such lactose-free, or any particulars for gift box",
     secDel: "5. Delivery Method Selection",
     delSweet: "Sweet Deal: You unlocked free local delivery!",
     delDirect: "Home Delivery",
@@ -274,7 +269,7 @@ const TRANSLATIONS = {
     slotAfternoon: "Iltapäivä (14:00 – 17:00)",
     slotEvening: "Ilta (17:00 – 20:00)",
     secDiet: "4. Erityistoiveet & Allergiat",
-    dietSub: "Mainitse tässä laktoosittomat toiveet, lahjapakkaukset tai onnittelutekstit",
+    dietSub: "Kerro tässä ruokavaliorajoitteista (kuten laktoositon) tai lahjalaatikkoon liittyvistä toiveista",
     secDel: "5. Toimitustapa",
     delSweet: "Loistavaa: Olet oikeutettu ilmaiseen kuljetukseen!",
     delDirect: "Kotiinkuljetus",
@@ -513,7 +508,7 @@ export default function App() {
           <a href="#" className="flex items-center gap-3 group">
             <div className="h-10 w-10 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm transition-transform group-hover:rotate-6 duration-300">
               <img 
-                src="Logo_2.jpg" 
+                src="/images/Logo.jpg" 
                 alt="Velvet Crumbs Logo" 
                 className="w-full h-full object-cover"
                 onError={(e) => {
@@ -614,15 +609,15 @@ export default function App() {
           </div>
 
           <div className="md:col-span-5 flex justify-center relative">
-            <div className="absolute inset-0 bg-gradient-to-tr from-rose-200 to-amber-200 blur-3xl opacity-40 rounded-full"></div>
+            <div className="absolute inset-0 bg-gradient-to-tr from-rose-200 to-amber-200 blur-3xl opacity-40 rounded-[2rem]"></div>
             <div className="relative">
-              <div className="w-64 h-64 sm:w-80 sm:h-80 rounded-full border-8 border-white shadow-2xl overflow-hidden bg-orange-100 flex items-center justify-center">
+              <div className="w-64 h-64 sm:w-80 sm:h-80 rounded-[2rem] border-8 border-white shadow-2xl overflow-hidden bg-orange-100 flex items-center justify-center">
                 <img 
-                  src="Logo_2.jpg" 
+                  src="/images/Main.jpg" 
                   alt="Velvet Crumbs Baking Showcase" 
                   className="w-full h-full object-cover transform hover:scale-105 duration-700 transition-transform" 
                   onError={(e) => {
-                    (e.target as any).src = "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&q=80&w=800";
+                    (e.target as any).src = "/images/Logo.jpg";
                   }}
                 />
               </div>
@@ -680,13 +675,13 @@ export default function App() {
                 key={c.id}
                 className="bg-white rounded-3xl border border-orange-100/60 overflow-hidden flex flex-col h-full hover:shadow-xl hover:border-[#F48B7D]/30 hover:-translate-y-1.5 transition-all duration-300"
               >
-                <div className="relative h-48 sm:h-56 overflow-hidden bg-orange-50">
+                <div className="relative aspect-square w-full overflow-hidden bg-orange-50">
                   <img 
                     src={c.img} 
                     alt={c.name[lang]} 
                     className="w-full h-full object-cover hover:scale-105 duration-500 transition-transform" 
                     onError={(e) => {
-                      (e.target as any).src = "https://images.unsplash.com/photo-1558961309-db6f1a3eb32e?auto=format&fit=crop&q=80&w=600";
+                      (e.target as any).src = "/images/1.Chochlate_Indulgence.jpg";
                     }}
                   />
                   {c.special && (
@@ -1100,7 +1095,7 @@ export default function App() {
             <div className="flex items-center gap-3">
               <div className="h-9 w-9 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm">
                 <img 
-                  src="Logo_2.jpg" 
+                  src="/images/Logo.jpg" 
                   alt="Velvet Crumbs Logo" 
                   className="w-full h-full object-cover"
                   onError={(e) => {
