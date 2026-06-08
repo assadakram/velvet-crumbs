@@ -185,6 +185,7 @@ const TRANSLATIONS = {
     secContact: "1. Contact Information",
     fullName: "Full Name *",
     phone: "Phone / WhatsApp *",
+    email: "Email Address (Optional)",
     address: "Delivery Address *",
     addressPlaceholder: "Street, postal code, city",
     secPick: "2. Build Your Box Selection",
@@ -250,6 +251,7 @@ const TRANSLATIONS = {
     secContact: "1. Yhteystiedot",
     fullName: "Nimi *",
     phone: "Puhelin / WhatsApp *",
+    email: "Sähköposti (Valinnainen)",
     address: "Toimitusosoite *",
     addressPlaceholder: "Katuosoite, postinumero, kaupunki",
     secPick: "2. Valitse Makusi ja Määrät",
@@ -289,7 +291,7 @@ const TRANSLATIONS = {
   }
 };
 
-const WHATSAPP_NUMBER = '358413170359';
+const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '358413170359';
 
 function TikTokIcon({ className }) {
   return (
@@ -332,6 +334,7 @@ export default function App() {
   const [form, setForm] = useState({
     name: '',
     phone: '',
+    email: '',
     address: '',
     date: '',
     timeSlot: 'any',
@@ -341,6 +344,14 @@ export default function App() {
 
   const [validationError, setValidationError] = useState('');
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => {
+      setToast({ message: '', type: null });
+    }, 4000);
+  };
 
   const t = (key) => TRANSLATIONS[lang][key] || key;
 
@@ -461,6 +472,14 @@ export default function App() {
       `*${lang === 'en' ? 'Estimated Total' : 'Arvioitu summa'}:* ${finalTotal.toFixed(2).replace('.', ',')} €\n\n` +
       `${bottomGreet}`;
 
+    const triggerWhatsAppRedirect = () => {
+      setTimeout(() => {
+        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderPayloadText)}`;
+        window.open(url, '_blank');
+        setIsRedirecting(false);
+      }, 1500);
+    };
+
     setIsRedirecting(true);
 
     try {
@@ -471,6 +490,7 @@ export default function App() {
           recipient: 'velvetcrumbs.fi@gmail.com',
           name: form.name,
           phone: form.phone,
+          email: form.email,
           address: form.address,
           deliveryMethod: form.deliveryMethod,
           date: form.date,
@@ -479,16 +499,30 @@ export default function App() {
           specialRequests: form.specialRequests,
           estimatedTotal: finalTotal
         })
-      }).catch(err => {
-        console.log('Static preview environment order logging.', err);
+      })
+      .then((res) => {
+        if (!res.ok) throw new Error("API failed");
+        showToast(
+          lang === 'en' ? "Order request logged! Redirecting to WhatsApp..." : "Tilauskysely kirjattu! Siirrytään WhatsAppiin...", 
+          'success'
+        );
+        triggerWhatsAppRedirect();
+      })
+      .catch(err => {
+        console.log('Order logging failed, fallback to WhatsApp only.', err);
+        showToast(
+          lang === 'en' ? "Email notice skipped, redirecting to WhatsApp..." : "Sähköposti-ilmoitus ohitettu, siirrytään WhatsAppiin...", 
+          'error'
+        );
+        triggerWhatsAppRedirect();
       });
-    } catch (err) {}
-
-    setTimeout(() => {
-      const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderPayloadText)}`;
-      window.open(url, '_blank');
-      setIsRedirecting(false);
-    }, 1200);
+    } catch (err) {
+      showToast(
+        lang === 'en' ? "Connecting to WhatsApp..." : "Yhdistetään WhatsAppiin...", 
+        'error'
+      );
+      triggerWhatsAppRedirect();
+    }
   };
 
   return (
@@ -506,7 +540,7 @@ export default function App() {
       <nav className="sticky top-0 w-full bg-[#FFF9F5]/90 backdrop-blur-md border-b border-orange-100/50 z-40 transition-all duration-300">
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
           <a href="#" className="flex items-center gap-3 group">
-            <div className="h-10 w-10 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm transition-transform group-hover:rotate-6 duration-300">
+            <div className="h-16 w-16 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm transition-transform group-hover:rotate-6 duration-300">
               <img 
                 src="/images/Logo.jpg" 
                 alt="Velvet Crumbs Logo" 
@@ -801,6 +835,20 @@ export default function App() {
                   </div>
                 </div>
 
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="text-[#F48B7D] text-lg">✉️</span> {t('email')}
+                  </label>
+                  <input 
+                    type="email" 
+                    name="email" 
+                    value={form.email}
+                    onChange={handleInputChange}
+                    placeholder="sara.virtanen@example.com (optional)"
+                    className="w-full px-4 py-3.5 rounded-xl border border-orange-100 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/20 focus:border-[#F48B7D] bg-white text-sm sm:text-base text-gray-800"
+                  />
+                </div>
+
                 <div className={`transition-all duration-300 overflow-hidden ${form.deliveryMethod === 'delivery' ? 'max-h-36 opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'}`}>
                   <div className="space-y-1.5 pt-1">
                     <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
@@ -1093,7 +1141,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-12 gap-8 items-start">
           <div className="md:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="h-9 w-9 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm">
+              <div className="h-16 w-16 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm">
                 <img 
                   src="/images/Logo.jpg" 
                   alt="Velvet Crumbs Logo" 
@@ -1167,6 +1215,18 @@ export default function App() {
           </div>
         </div>
       </footer>
+
+      {/* Toast Notification */}
+      {toast.type && (
+        <div className={`fixed bottom-5 right-5 z-50 flex items-center gap-2 px-5 py-3.5 rounded-2xl shadow-xl border text-sm font-bold animate-bounce ${
+          toast.type === 'success' 
+            ? 'bg-emerald-50 border-emerald-100 text-emerald-800' 
+            : 'bg-rose-50 border-rose-100 text-rose-800'
+        }`}>
+          <span>{toast.type === 'success' ? '✨' : '⚠️'}</span>
+          <span>{toast.message}</span>
+        </div>
+      )}
     </div>
   );
 }
