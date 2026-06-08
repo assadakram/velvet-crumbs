@@ -26,16 +26,21 @@ Instead of forcing users through a rigid checkout/payment gateway system, the ap
    * 🚚 **Free Delivery**: Automatically unlocks free local home delivery for orders of **6 or more cookies** (otherwise, local delivery is €5,00).
    * 🎁 **Bonus Surprise Cookie**: Automatically adds 1 free *Funfetti Surprise* cookie to the order receipt for every **batch of 8 cookies** selected.
 4. **Structured Pre-Order Flow**:
-   * **Step 1: Contact Details** (Name, Phone/WhatsApp, optional Address)
+   * **Step 1: Contact Details** (Name, Phone/WhatsApp, optional Email, and optional Address)
    * **Step 2: Box Builder** (Cookie quantities + live receipt)
    * **Step 3: Delivery Details** (Date selector with today's date as min limit, preferred time windows)
    * **Step 4: Dietary & Special Requests** (Allergen options, gift cards)
    * **Step 5: Fulfillment Method** (Direct Home Delivery vs. Self-pickup from Kunnallissairaalantie 52A, Turku)
-5. **Checkout Dispatching**:
-   * Fires a background API request (`POST /api/order`) to log the inquiry details.
-   * Compiles the selections into a beautifully formatted text payload and redirects the user to WhatsApp Web or the WhatsApp mobile app to submit the request.
-6. **Graceful Assets Handling**:
-   * Automatically falls back to high-resolution placeholder images or styled initials if local asset paths (`Logo_2.jpg`) are missing.
+5. **Nodemailer Email Notification & BCC**:
+   * Submits the form data via a background API (`POST /api/order`).
+   * Sends a beautifully formatted HTML order receipt to the bakery (`RECEIVER_EMAIL`).
+   * If the customer enters an email, they are dynamically BCC'd to receive their own copy.
+6. **Toast Notifications & WhatsApp Redirection Flow**:
+   * Displays modern, styled floating **Toast Notifications** (Success/Error states) on submission instead of standard browser alert windows.
+   * Redirects the user to WhatsApp after a 1.5-second delay to finalize the conversation, ensuring that any temporary SMTP/email issues do not block checkout.
+7. **Graceful Assets Handling**:
+   * Automatically falls back to high-resolution placeholder images or styled initials if local asset paths are missing.
+
 
 ---
 
@@ -43,6 +48,7 @@ Instead of forcing users through a rigid checkout/payment gateway system, the ap
 
 * **Core Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 * **Library**: React 19 (Client Components, Hooks: `useState`, `useEffect`, `useMemo`)
+* **Email System**: [Nodemailer](https://nodemailer.com/) (using Gmail SMTP backend with support for HTML formatted receipts and conditional customer BCC)
 * **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with a custom warm color palette (`#FFF9F5` background, `#F48B7D` accents)
 * **Icons**: [Lucide React](https://lucide.dev/) (with custom SVG overrides for social brand icons like `Instagram` and `Facebook` to ensure robust rendering across environments)
 * **Language Support**: Custom key-value translation dictionaries for `en` and `fi`
@@ -55,12 +61,15 @@ Instead of forcing users through a rigid checkout/payment gateway system, the ap
 velvet_crumbs_next_gen_pre_order_app/
 ├── src/
 │   └── app/
-│       ├── layout.tsx     # Global HTML/Body layout, Google Font integrations, and SEO metadata
-│       ├── page.tsx       # Core pre-order builder page (includes products, translations, form logic & styling)
-│       └── globals.css    # Tailwind CSS imports and global base styles
-├── public/                # Public assets (logos, images, etc.)
-├── package.json           # Application dependencies and build scripts
-└── tsconfig.json          # TypeScript compiler configuration (configured with strict: false for maximum runtime flexibility)
+│       ├── api/
+│       │   └── order/
+│       │       └── route.ts   # Order processing endpoint (validates payload, sends HTML email, handles BCC)
+│       ├── layout.tsx         # Global HTML/Body layout, Google Font integrations, and SEO metadata
+│       ├── page.tsx           # Core pre-order builder page (includes products, translations, form logic & styling)
+│       └── globals.css        # Tailwind CSS imports and global base styles
+├── public/                    # Public assets (logos, images, etc.)
+├── package.json               # Application dependencies and build scripts
+└── tsconfig.json              # TypeScript compiler configuration (configured with strict: false for maximum runtime flexibility)
 ```
 
 ---
@@ -92,3 +101,16 @@ To build the static application bundle:
 ```bash
 npm run build
 ```
+
+### 5. Environment Configuration
+Create a `.env` file in the root directory (you can copy `.env.example` as a template):
+```bash
+cp .env.example .env
+```
+
+Define the following environment variables:
+* `GMAIL_USER`: The Gmail address used to authenticate and send the order emails (e.g., `example@gmail.com`).
+* `GMAIL_PASS`: The 16-character Google App Password for the Gmail account.
+* `RECEIVER_EMAIL`: The recipient email address where the bakery receives new orders.
+* `NEXT_PUBLIC_WHATSAPP_NUMBER`: The WhatsApp phone number (without any prefixing symbols/spaces, e.g. `358413170359`) that customers will be redirected to upon form submission.
+

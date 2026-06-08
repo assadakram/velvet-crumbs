@@ -572,7 +572,7 @@ export default function App() {
           <div className="flex items-center gap-3">
             <button 
               onClick={() => setLang(lang === 'en' ? 'fi' : 'en')}
-              className="text-xs font-bold border-2 border-[#F48B7D] text-[#F48B7D] hover:bg-[#F48B7D] hover:text-white px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1 uppercase tracking-wider"
+              className="cursor-pointer text-xs font-bold border-2 border-[#F48B7D] text-[#F48B7D] hover:bg-[#F48B7D] hover:text-white px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1 uppercase tracking-wider"
               aria-label="Toggle language"
             >
               <Globe className="h-3 w-3" />
@@ -580,7 +580,7 @@ export default function App() {
             </button>
             <a 
               href="#order" 
-              className="bg-[#F48B7D] text-white px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-md hover:bg-rose-400 active:scale-95 transition-all duration-200"
+              className="cursor-pointer bg-[#F48B7D] text-white px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-md hover:bg-rose-400 active:scale-95 transition-all duration-200"
             >
               {t('navOrder')}
             </a>
@@ -629,13 +629,13 @@ export default function App() {
             <div className="flex flex-wrap gap-4 pt-2">
               <a 
                 href="#order" 
-                className="bg-[#F48B7D] text-white px-8 py-4 rounded-full font-bold shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 text-sm sm:text-base"
+                className="cursor-pointer bg-[#F48B7D] text-white px-8 py-4 rounded-full font-bold shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 text-sm sm:text-base"
               >
                 {t('btnBuild')}
               </a>
               <a 
                 href="#cookies" 
-                className="border-2 border-[#F48B7D] text-[#F48B7D] px-8 py-4 rounded-full font-bold hover:bg-[#F48B7D] hover:text-white transition-all duration-200 text-sm sm:text-base"
+                className="cursor-pointer border-2 border-[#F48B7D] text-[#F48B7D] px-8 py-4 rounded-full font-bold hover:bg-[#F48B7D] hover:text-white transition-all duration-200 text-sm sm:text-base"
               >
                 {t('btnExplore')}
               </a>
@@ -900,7 +900,7 @@ export default function App() {
                         <button 
                           type="button" 
                           onClick={() => updateQuantity(c.id, -1)}
-                          className="h-8 w-8 rounded-full border border-rose-200 text-[#F48B7D] flex items-center justify-center font-bold hover:bg-[#F48B7D] hover:text-white transition-colors duration-150 text-sm"
+                          className="cursor-pointer h-8 w-8 rounded-full border border-rose-200 text-[#F48B7D] flex items-center justify-center font-bold hover:bg-[#F48B7D] hover:text-white transition-colors duration-150 text-sm"
                         >
                           <Minus className="h-3.5 w-3.5" />
                         </button>
@@ -910,7 +910,7 @@ export default function App() {
                         <button 
                           type="button" 
                           onClick={() => updateQuantity(c.id, 1)}
-                          className="h-8 w-8 rounded-full border border-rose-200 text-[#F48B7D] flex items-center justify-center font-bold hover:bg-[#F48B7D] hover:text-white transition-colors duration-150 text-sm"
+                          className="cursor-pointer h-8 w-8 rounded-full border border-rose-200 text-[#F48B7D] flex items-center justify-center font-bold hover:bg-[#F48B7D] hover:text-white transition-colors duration-150 text-sm"
                         >
                           <Plus className="h-3.5 w-3.5" />
                         </button>
@@ -1055,7 +1055,7 @@ export default function App() {
                   <button 
                     type="button"
                     onClick={() => setForm(prev => ({ ...prev, deliveryMethod: 'delivery' }))}
-                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition-all duration-200 ${
+                    className={`cursor-pointer flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition-all duration-200 ${
                       form.deliveryMethod === 'delivery' 
                         ? 'border-[#F48B7D] bg-rose-50/40 shadow-sm' 
                         : 'border-orange-100 bg-white hover:border-orange-200'
@@ -1072,7 +1072,7 @@ export default function App() {
                   <button 
                     type="button"
                     onClick={() => setForm(prev => ({ ...prev, deliveryMethod: 'pickup' }))}
-                    className={`flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition-all duration-200 ${
+                    className={`cursor-pointer flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition-all duration-200 ${
                       form.deliveryMethod === 'pickup' 
                         ? 'border-[#F48B7D] bg-rose-50/40 shadow-sm' 
                         : 'border-orange-100 bg-white hover:border-orange-200'
@@ -1110,7 +1110,7 @@ export default function App() {
                   type="submit" 
                   onClick={handleOrderSubmit}
                   disabled={isRedirecting}
-                  className="w-full max-w-md mx-auto bg-white text-[#F48B7D] hover:bg-rose-50 px-6 py-4 rounded-xl font-bold text-base sm:text-lg shadow-md active:scale-95 duration-200 transition-all flex items-center justify-center gap-2"
+                  className="cursor-pointer w-full max-w-md mx-auto bg-white text-[#F48B7D] hover:bg-rose-50 px-6 py-4 rounded-xl font-bold text-base sm:text-lg shadow-md active:scale-95 duration-200 transition-all flex items-center justify-center gap-2"
                 >
                   <span>📲</span>
                   <span>{t('btnSendWA')}</span>
@@ -1186,7 +1186,7 @@ export default function App() {
                 href="https://www.instagram.com/velvet.crumbs.fi?igsh=MWRlanN5cDF3Z3NwNA==" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#F48B7D] transition-colors"
+                className="cursor-pointer text-gray-400 hover:text-[#F48B7D] transition-colors"
                 aria-label="Instagram Profile"
               >
                 <Instagram className="h-5 w-5" />
@@ -1196,7 +1196,7 @@ export default function App() {
                 href="https://www.tiktok.com/@velvet.crumbs.fi" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#F48B7D] transition-colors"
+                className="cursor-pointer text-gray-400 hover:text-[#F48B7D] transition-colors"
                 aria-label="TikTok Account"
               >
                 <TikTokIcon className="h-5 w-5" />
@@ -1206,7 +1206,7 @@ export default function App() {
                 href="https://www.facebook.com/share/1Cy5qw9J25/" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-[#F48B7D] transition-colors"
+                className="cursor-pointer text-gray-400 hover:text-[#F48B7D] transition-colors"
                 aria-label="Facebook Page"
               >
                 <Facebook className="h-5 w-5" />
