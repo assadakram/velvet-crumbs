@@ -25,10 +25,10 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-amber-800 to-amber-950',
-    name: { en: 'Chocolate Indulgence', fi: 'Suklaaunelma' },
+    name: { en: 'Chocolate Indulgence (around 140g)', fi: 'Suklaaunelma (n. 140g)' },
     desc: { 
-      en: 'A rich chocolate cookie with plenty of chocolate chunks and a gooey Nutella center.',
-      fi: 'Täyteläinen suklaakeksi, jossa on runsaasti suklaalohkoja ja pehmeä Nutella-sydän.' 
+      en: 'A rich chocolate cookie with plenty of chocolate chunks and a gooey hazelnut cocoa center.',
+      fi: 'Täyteläinen suklaakeksi, jossa on runsaasti suklaalohkoja ja pehmeä hasselpähkinäsuklaasydän.' 
     },
     ingredients: { 
       en: ['Egg', 'Wheat', 'Milk', 'Hazelnut'],
@@ -42,10 +42,10 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-amber-600 to-amber-800',
-    name: { en: 'Nutella Chocolate Chip', fi: 'Nutella Suklaahippu' },
+    name: { en: 'Hazelnut Chocolate Chip (around 140g)', fi: 'Hasselpähkinä Suklaahippu (n. 140g)' },
     desc: { 
-      en: 'Classic cookie dough with chocolate chips and a soft Nutella filling.',
-      fi: 'Klassinen keksitaikina suklaahipuilla ja pehmeällä Nutella-täytteellä.' 
+      en: 'Classic cookie dough with chocolate chips and a soft hazelnut spread filling.',
+      fi: 'Klassinen keksitaikina suklaahipuilla ja pehmeällä hasselpähkinälevitetäytteellä.' 
     },
     ingredients: { 
       en: ['Egg', 'Wheat', 'Milk', 'Hazelnut'],
@@ -59,10 +59,10 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-yellow-700 to-amber-800',
-    name: { en: 'Lotus Gold', fi: 'Lotus Kulta' },
+    name: { en: 'Caramel Gold (around 140g)', fi: 'Karamelli Kulta (n. 140g)' },
     desc: { 
-      en: 'A Lotus Biscoff cookie with white chocolate chips and a soft, gooey Lotus filling.',
-      fi: 'Lotus Biscoff -keksi valkosuklaahipuilla ja pehmeällä, valuvalla Lotus-täytteellä.' 
+      en: 'A caramelized biscuit cookie with white chocolate chips and a soft, gooey caramel filling.',
+      fi: 'Karamellisoitu keksi valkosuklaahipuilla ja pehmeällä, valuvalla karamellitäytteellä.' 
     },
     ingredients: { 
       en: ['Egg', 'Wheat', 'Milk'],
@@ -76,14 +76,14 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-rose-400 to-rose-600',
-    name: { en: 'Ruby Velvet Bliss', fi: 'Ruby Velvet Bliss' },
+    name: { en: 'Ruby Velvet Bliss (around 140g)', fi: 'Ruby Velvet Bliss (n. 140g)' },
     desc: { 
       en: 'Soft red cookie dough with white chocolate chips and a rich cream cheese filling in the center.',
       fi: 'Pehmeä punainen keksitaikina valkosuklaahipuilla ja täyteläisellä tuorejuustotäytteellä keskellä.' 
     },
     ingredients: { 
-      en: ['Egg', 'Wheat', 'Milk', 'Food color'],
-      fi: ['Kananmuna', 'Vehnä', 'Maito', 'Milk', 'Elintarvikeväri'] 
+      en: ['Egg', 'Wheat', 'Food color'],
+      fi: ['Kananmuna', 'Vehnä', 'Elintarvikeväri'] 
     }
   },
   { 
@@ -93,7 +93,7 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-orange-500 to-amber-600',
-    name: { en: 'Carrot Cake Cookie', fi: 'Porkkanakakku' },
+    name: { en: 'Carrot Cake Cookie (around 140g)', fi: 'Porkkanakakku (n. 140g)' },
     desc: { 
       en: 'A carrot cake-inspired cookie with toasted walnuts and a mildly spiced cream cheese filling.',
       fi: 'Porkkanakakusta inspiroitunut keksi paahdetuilla saksanpähkinöillä ja miedosti maustetulla tuorejuustotäytteellä.' 
@@ -110,7 +110,7 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-amber-700 to-amber-900',
-    name: { en: 'Peanut Dusk', fi: 'Pähkinähämärä' },
+    name: { en: 'Peanut Dusk (around 140g)', fi: 'Pähkinähämärä (n. 140g)' },
     desc: { 
       en: 'A cookie with roasted peanuts, white and dark chocolate, and a rich peanut butter filling.',
       fi: 'Keksi paahdetuilla maapähkinöillä, valko- ja tummasuklaalla sekä täyteläisellä maapähkinävoitäytteellä.' 
@@ -127,7 +127,7 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-red-600 to-pink-700',
-    name: { en: 'Jam Swirl', fi: 'Hillokierre' },
+    name: { en: 'Jam Swirl (around 140g)', fi: 'Hillokierre (n. 140g)' },
     desc: { 
       en: 'A chocolate cookie filled with a soft cream cheese and jam filling, finished with raspberry jam.',
       fi: 'Suklaakeksi, jossa pehmeä tuorejuusto- ja hillotäyte, viimeistelty vadelmahillolla.' 
@@ -144,7 +144,7 @@ const COOKIES = [
     origPrice: 0, 
     special: true,
     color: 'from-purple-400 to-pink-500',
-    name: { en: 'Funfetti Surprise', fi: 'Funfetti-yllätys' },
+    name: { en: 'Funfetti Surprise (around 140g)', fi: 'Funfetti-yllätys (n. 140g)' },
     desc: { 
       en: 'A colorful birthday-cake treat with crisp Smarties and a molten milk chocolate core. Auto-added on orders of 8+ cookies!',
       fi: 'Värikäs herkkukeksi täynnä Smarties-suklaarakeita ja maitosuklaasydän. Lisätään lahjaksi 8+ keksin laatikoihin!' 
@@ -717,7 +717,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {COOKIES.map(c => (
               <div 
                 key={c.id}
@@ -903,14 +903,14 @@ export default function App() {
                           <img src={c.img} alt="" className="w-full h-full object-cover" />
                         </div>
                         <div className="min-w-0">
-                          <h4 className="font-bold text-sm sm:text-base text-[#2D2D2D] truncate">{c.name[lang]}</h4>
+                          <h4 className="font-bold text-xs min-[360px]:text-sm sm:text-base text-[#2D2D2D] line-clamp-2 leading-tight">{c.name[lang]}</h4>
                           <span className="text-xs sm:text-sm text-[#F48B7D] font-bold block mt-0.5">
                             {c.price.toFixed(2).replace('.', ',')} €
                           </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2.5 shrink-0">
+                      <div className="flex items-center gap-0.5 shrink-0">
                         <button 
                           type="button" 
                           onClick={() => updateQuantity(c.id, -1)}
