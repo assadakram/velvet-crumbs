@@ -903,7 +903,7 @@ export default function App() {
                       key={c.id}
                       className="flex items-start gap-3.5 p-3.5 bg-white rounded-2xl border border-orange-50 shadow-sm"
                     >
-                      <div className="h-17 w-17 rounded-xl overflow-hidden bg-orange-100 shrink-0">
+                      <div className="size-16 rounded-xl overflow-hidden bg-orange-100 shrink-0">
                         <img src={c.img} alt="" className="w-full h-full object-cover" />
                       </div>
                       
@@ -922,7 +922,7 @@ export default function App() {
                             {c.price.toFixed(2).replace('.', ',')} €
                           </span>
                           
-                          <div className="flex items-center gap-0.5 shrink-0">
+                          <div className="flex items-center gap-0.5 shrink-0 -mt-1">
                             <button 
                               type="button" 
                               onClick={() => updateQuantity(c.id, -1)}
