@@ -221,7 +221,10 @@ const TRANSLATIONS = {
     alertValidAddress: "⚠️ Please provide your delivery address for Home Delivery.",
     waRedirectTitle: "Processing Your Order Request",
     waRedirectDesc: "Your order details have been securely recorded. We are preparing to coordinate delivery window options.",
-    bonusItem: "Free Bonus Cookie"
+    payTitle: "Payment & Confirmation Policy",
+    payDesc: "No payment is collected during checkout. Once we receive your request, we will contact you privately (via WhatsApp or Email) to confirm availability and share payment details (MobilePay or Bank Transfer). In most cases, orders are confirmed once a payment screenshot is shared. Cash on pickup/delivery is accepted in select cases.",
+    payAck: "I understand that my order is baked fresh and only confirmed once payment is made in advance (MobilePay/Bank Transfer) and a screenshot of the payment is shared.",
+    alertPayAck: "⚠️ Please confirm that you understand the payment policy by checking the acknowledgment box."
   },
   fi: {
     allergenWarn: "Allergeenit: Suurin osa tuotteistamme sisältää vehnää, kananmunia, pähkinöitä ja maitotuotteita. Laktoosittomat vaihtoehdot tilattavissa — kirjoita toiveesi lisätietokenttään.",
@@ -287,7 +290,11 @@ const TRANSLATIONS = {
     alertValidAddress: "⚠️ Ilmoitathan toimitusosoitteen kotiinkuljetusta varten.",
     waRedirectTitle: "Käsitellään tilaustasi",
     waRedirectDesc: "Tilaustietosi on kirjattu suojatusti ylös. Valmistelemme toimitusaikojen vahvistamista.",
-    bonusItem: "Lahjakeksi"
+    bonusItem: "Lahjakeksi",
+    payTitle: "Maksutiedot & Vahvistuskäytäntö",
+    payDesc: "Sivustolla ei vastaanoteta maksuja. Saatuamme pyyntösi otamme sinuun yhteyttä (WhatsApp tai sähköposti) vahvistaaksemme saatavuuden ja lähetämme maksutiedot (MobilePay tai tilisiirto). Tilaus vahvistetaan, kun lähetät meille maksukuitin/-kuvakaappauksen. Käteinen noudettaessa/toimitettaessa sopimuksen mukaan.",
+    payAck: "Ymmärrän, että tilaukseni leivotaan tuoreena ja vahvistetaan vasta, kun ennakkomaksu (MobilePay/tilisiirto) on suoritettu ja maksukuitti/-kuvakaappaus on jaettu.",
+    alertPayAck: "⚠️ Vahvistathan lukeneesi maksuehdot valitsemalla vahvistusruudun."
   }
 };
 
@@ -344,6 +351,7 @@ export default function App() {
 
   const [validationError, setValidationError] = useState('');
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [paymentAcknowledge, setPaymentAcknowledge] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
 
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -428,6 +436,11 @@ export default function App() {
 
     if (form.deliveryMethod === 'delivery' && !form.address.trim()) {
       setValidationError(t('alertValidAddress'));
+      return;
+    }
+
+    if (!paymentAcknowledge) {
+      setValidationError(t('alertPayAck'));
       return;
     }
 
@@ -1100,6 +1113,40 @@ export default function App() {
                     {t('waWarning')}
                   </p>
                 </div>
+
+                <div className="bg-white border border-rose-100 rounded-2xl p-4.5 text-left space-y-2 max-w-md mx-auto text-[11px] sm:text-xs shadow-md">
+                  <h4 className="font-bold flex items-center gap-1.5 text-amber-700">
+                    <span>💡</span> {t('payTitle')}
+                  </h4>
+                  <p className="text-gray-600 leading-relaxed font-medium">
+                    {t('payDesc')}
+                  </p>
+                </div>
+
+                <label className="cursor-pointer flex items-start gap-3 max-w-md mx-auto text-left text-white/95 text-[11px] sm:text-xs font-semibold select-none mt-3.5 group">
+                  <div className="relative shrink-0 mt-0.5">
+                    <input 
+                      type="checkbox" 
+                      checked={paymentAcknowledge} 
+                      onChange={(e) => setPaymentAcknowledge(e.target.checked)}
+                      className="sr-only"
+                    />
+                    <div className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-200 ${
+                      paymentAcknowledge 
+                        ? 'bg-white border-white text-[#F48B7D] scale-105 shadow-md' 
+                        : 'border-white/50 bg-white/10 group-hover:border-white group-hover:bg-white/20'
+                    }`}>
+                      {paymentAcknowledge && (
+                        <svg className="w-3.5 h-3.5 stroke-current stroke-[3.5] fill-none" viewBox="0 0 24 24">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
+                    </div>
+                  </div>
+                  <span className="leading-relaxed">
+                    {t('payAck')}
+                  </span>
+                </label>
 
                 {validationError && (
                   <div className="bg-white/15 border border-white/25 text-rose-50 text-xs sm:text-sm font-bold p-3 rounded-xl max-w-md mx-auto">
