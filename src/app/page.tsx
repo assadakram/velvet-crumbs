@@ -538,9 +538,9 @@ export default function App() {
 
       {/* NAVIGATION */}
       <nav className="sticky top-0 w-full bg-[#FFF9F5]/90 backdrop-blur-md border-b border-orange-100/50 z-40 transition-all duration-300">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <a href="#" className="flex items-center gap-3 group">
-            <div className="h-16 w-16 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm transition-transform group-hover:rotate-6 duration-300">
+        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4 sm:gap-6">
+          <a href="#" className="flex items-center gap-2 sm:gap-3 group">
+            <div className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm transition-transform group-hover:rotate-6 duration-300">
               <img 
                 src="/images/Logo.jpg" 
                 alt="Velvet Crumbs Logo" 
@@ -552,7 +552,7 @@ export default function App() {
                 }}
               />
             </div>
-            <span className="text-xl font-bold tracking-tight text-[#F48B7D] font-serif">
+            <span className="text-sm sm:text-xl font-bold tracking-tight text-[#F48B7D] font-serif leading-tight whitespace-normal">
               {t('brandName')}
             </span>
           </a>
@@ -569,18 +569,19 @@ export default function App() {
             </a>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <button 
               onClick={() => setLang(lang === 'en' ? 'fi' : 'en')}
-              className="cursor-pointer text-xs font-bold border-2 border-[#F48B7D] text-[#F48B7D] hover:bg-[#F48B7D] hover:text-white px-3 py-1.5 rounded-full transition-all duration-200 flex items-center gap-1 uppercase tracking-wider"
+              className="cursor-pointer text-xs font-bold border-2 border-[#F48B7D] text-[#F48B7D] hover:bg-[#F48B7D] hover:text-white px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-full transition-all duration-200 flex items-center gap-1 uppercase tracking-wider"
               aria-label="Toggle language"
             >
-              <Globe className="h-3 w-3" />
-              <span>{lang === 'en' ? 'Suomi' : 'English'}</span>
+              <Globe className="h-3 w-3 shrink-0" />
+              <span className="hidden sm:inline">{lang === 'en' ? 'Suomi' : 'English'}</span>
+              <span className="sm:hidden">{lang === 'en' ? 'FI' : 'EN'}</span>
             </button>
             <a 
               href="#order" 
-              className="cursor-pointer bg-[#F48B7D] text-white px-5 py-2 rounded-full text-xs sm:text-sm font-bold shadow-md hover:bg-rose-400 active:scale-95 transition-all duration-200"
+              className="cursor-pointer bg-[#F48B7D] text-white px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-md hover:bg-rose-400 active:scale-95 transition-all duration-200"
             >
               {t('navOrder')}
             </a>
@@ -1141,7 +1142,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-12 gap-8 items-start">
           <div className="md:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
-              <div className="h-16 w-16 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm">
+              <div className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm">
                 <img 
                   src="/images/Logo.jpg" 
                   alt="Velvet Crumbs Logo" 
