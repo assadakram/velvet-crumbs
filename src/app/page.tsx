@@ -182,13 +182,13 @@ const TRANSLATIONS = {
     orderTag: "Request Fresh Baking",
     orderTitle: "Pre-order Request",
     orderPromo: "🎁 Order 6+ cookies → FREE delivery in Turku, Raisio & Kaarina!",
-    secContact: "1. Contact Information",
+    secContact: "Contact Information",
     fullName: "Full Name *",
     phone: "Phone / WhatsApp *",
     email: "Email Address (Optional)",
     address: "Delivery Address *",
     addressPlaceholder: "Street, postal code, city",
-    secPick: "2. Build Your Box Selection",
+    secPick: "Build Your Box Selection",
     stepperSub: "Adjust quantities of your desired flavors. Launch Price: 3,99 € each.",
     bonusTitle: "Bonus Surprise Cookie:",
     bonusDesc: "We will include 1 extra Surprise Cookie totally free with every order of 8 or more cookies!",
@@ -196,7 +196,7 @@ const TRANSLATIONS = {
     colCookie: "Cookie Type",
     colQty: "Qty",
     colPrice: "Price",
-    secTime: "3. Delivery Date & Time",
+    secTime: "Delivery Date & Time",
     delDate: "Delivery / Pickup Date *",
     timeWindow: "Preferred Time Window",
     anyTime: "Any time of day",
@@ -204,7 +204,7 @@ const TRANSLATIONS = {
     slotNoon: "Noon (12:00 – 14:00)",
     slotAfternoon: "Afternoon (14:00 – 17:00)",
     slotEvening: "Evening (17:00 – 20:00)",
-    secDiet: "4. Special Requests & Dietaries",
+    secDiet: "Special Requests & Dietaries",
     dietSub: "List any dietary reservations such lactose-free, or any particulars for gift box",
     secDel: "5. Delivery Method Selection",
     delSweet: "Sweet Deal: You unlocked free local delivery!",
@@ -251,13 +251,13 @@ const TRANSLATIONS = {
     orderTag: "Tee Tilaus",
     orderTitle: "Tilauskysely",
     orderPromo: "🎁 Tilaa 6+ keksiä → ILMAINEN kotiinkuljetus Turussa, Raisiossa & Kaarinassa!",
-    secContact: "1. Yhteystiedot",
+    secContact: "Yhteystiedot",
     fullName: "Nimi *",
     phone: "Puhelin / WhatsApp *",
     email: "Sähköposti (Valinnainen)",
     address: "Toimitusosoite *",
     addressPlaceholder: "Katuosoite, postinumero, kaupunki",
-    secPick: "2. Valitse Makusi ja Määrät",
+    secPick: "Valitse Makusi ja Määrät",
     stepperSub: "Lisää haluamiesi makujen määriä laatikoosi. Avajaishinta vain 3,99 € / kpl.",
     bonusTitle: "Automaattinen lahja:",
     bonusDesc: "Lisäämme lahjaksi 1 ylimääräisen yllätyskeksin ilmaiseksi aina, kun tilaat vähintään 8 herkkukeksiä!",
@@ -265,7 +265,7 @@ const TRANSLATIONS = {
     colCookie: "Keksityyppi",
     colQty: "Kpl",
     colPrice: "Hinta",
-    secTime: "3. Toivottu Toimituspäivä & Aika",
+    secTime: "Toivottu Toimituspäivä & Aika",
     delDate: "Toimituksen Päivämäärä *",
     timeWindow: "Toivottu Aikaikkuna",
     anyTime: "Sopii mikä vain aika",
@@ -273,9 +273,9 @@ const TRANSLATIONS = {
     slotNoon: "Keskipäivä (12:00 – 14:00)",
     slotAfternoon: "Iltapäivä (14:00 – 17:00)",
     slotEvening: "Ilta (17:00 – 20:00)",
-    secDiet: "4. Erityistoiveet & Allergiat",
+    secDiet: "Erityistoiveet & Allergiat",
     dietSub: "Kerro tässä ruokavaliorajoitteista (kuten laktoositon) tai lahjalaatikkoon liittyvistä toiveista",
-    secDel: "5. Toimitustapa",
+    secDel: "Toimitustapa",
     delSweet: "Loistavaa: Olet oikeutettu ilmaiseen kuljetukseen!",
     delDirect: "Kotiinkuljetus",
     delPickup: "Nouto",
@@ -425,22 +425,31 @@ export default function App() {
 
     if (totalCookiesCount === 0) {
       setValidationError(t('alertValidCart'));
-      document.getElementById('order-builder-section').scrollIntoView({ behavior: 'smooth' });
+      document.getElementById('cookie-selection-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
-    if (!form.name.trim() || !form.phone.trim() || !form.date) {
+    if (!form.name.trim() || !form.phone.trim()) {
       setValidationError(t('alertValidFields'));
+      document.getElementById('contact-details-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    if (!form.date) {
+      setValidationError(t('alertValidFields'));
+      document.getElementById('date-time-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
     if (form.deliveryMethod === 'delivery' && !form.address.trim()) {
       setValidationError(t('alertValidAddress'));
+      document.getElementById('contact-details-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
     if (!paymentAcknowledge) {
       setValidationError(t('alertPayAck'));
+      document.getElementById('checkout-cta-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
@@ -815,82 +824,10 @@ export default function App() {
           <div id="order-builder-section" className="max-w-3xl mx-auto">
             <form onSubmit={handleOrderSubmit} className="space-y-8">
               
-              {}
-              {/* Step 1: Contact details */}
-              <div className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5">
+              {/* Step 1: Cookie selection stepper */}
+              <div id="cookie-selection-section" className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5">
                 <div className="flex items-center gap-3 border-b border-orange-100 pb-3">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-100 text-[#F48B7D] text-sm font-bold">1</span>
-                  <h3 className="font-bold text-base sm:text-lg text-[#F48B7D] uppercase tracking-wider">{t('secContact')}</h3>
-                </div>
-                
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div className="space-y-1.5">
-                    <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
-                      <User className="h-4 w-4 text-[#F48B7D]" /> {t('fullName')}
-                    </label>
-                    <input 
-                      type="text" 
-                      name="name" 
-                      required 
-                      value={form.name}
-                      onChange={handleInputChange}
-                      placeholder="Sara Virtanen"
-                      className="w-full px-4 py-3.5 rounded-xl border border-orange-100 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/20 focus:border-[#F48B7D] bg-white text-sm sm:text-base text-gray-800"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
-                      <Phone className="h-4 w-4 text-[#F48B7D]" /> {t('phone')}
-                    </label>
-                    <input 
-                      type="tel" 
-                      name="phone" 
-                      required 
-                      value={form.phone}
-                      onChange={handleInputChange}
-                      placeholder="+358 40 123 4567"
-                      className="w-full px-4 py-3.5 rounded-xl border border-orange-100 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/20 focus:border-[#F48B7D] bg-white text-sm sm:text-base text-gray-800"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5 pt-1">
-                  <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
-                    <span className="text-[#F48B7D] text-lg">✉️</span> {t('email')}
-                  </label>
-                  <input 
-                    type="email" 
-                    name="email" 
-                    value={form.email}
-                    onChange={handleInputChange}
-                    placeholder="sara.virtanen@example.com (optional)"
-                    className="w-full px-4 py-3.5 rounded-xl border border-orange-100 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/20 focus:border-[#F48B7D] bg-white text-sm sm:text-base text-gray-800"
-                  />
-                </div>
-
-                <div className={`transition-all duration-300 overflow-hidden ${form.deliveryMethod === 'delivery' ? 'max-h-36 opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'}`}>
-                  <div className="space-y-1.5 pt-1">
-                    <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
-                      <MapPin className="h-4 w-4 text-[#F48B7D]" /> {t('address')}
-                    </label>
-                    <input 
-                      type="text" 
-                      name="address" 
-                      required={form.deliveryMethod === 'delivery'}
-                      value={form.address}
-                      onChange={handleInputChange}
-                      placeholder={t('addressPlaceholder')}
-                      className="w-full px-4 py-3.5 rounded-xl border border-orange-100 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/20 focus:border-[#F48B7D] bg-white text-sm sm:text-base text-gray-800"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {}
-              {/* Step 2: Cookie selection stepper */}
-              <div className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5">
-                <div className="flex items-center gap-3 border-b border-orange-100 pb-3">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-100 text-[#F48B7D] text-sm font-bold">2</span>
                   <h3 className="font-bold text-base sm:text-lg text-[#F48B7D] uppercase tracking-wider">{t('secPick')}</h3>
                 </div>
                 <p className="text-sm sm:text-base text-gray-500 leading-relaxed">
@@ -999,11 +936,101 @@ export default function App() {
                 )}
               </div>
 
-              {}
-              {/* Step 3: Date, time slots & delivery methods */}
-              <div className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5">
+              {/* Step 2: Special dietary requests */}
+              <div id="special-requests-section" className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5">
+                <div className="flex items-center gap-3 border-b border-orange-100 pb-3">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-100 text-[#F48B7D] text-sm font-bold">2</span>
+                  <h3 className="font-bold text-base sm:text-lg text-[#F48B7D] uppercase tracking-wider">{t('secDiet')}</h3>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <MessageSquare className="h-4 w-4 text-[#F48B7D]" /> {t('dietSub')}
+                  </label>
+                  <textarea 
+                    name="specialRequests"
+                    value={form.specialRequests}
+                    onChange={handleInputChange}
+                    rows={3}
+                    placeholder="e.g. Please make the Chocolate Indulgence cookies lactose-free, or this is a birthday surprise gift box!"
+                    className="w-full px-4 py-3.5 rounded-xl border border-orange-100 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/20 focus:border-[#F48B7D] bg-white text-sm sm:text-base text-gray-800"
+                  />
+                </div>
+              </div>
+
+              {/* Step 3: Contact details */}
+              <div id="contact-details-section" className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5">
                 <div className="flex items-center gap-3 border-b border-orange-100 pb-3">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-100 text-[#F48B7D] text-sm font-bold">3</span>
+                  <h3 className="font-bold text-base sm:text-lg text-[#F48B7D] uppercase tracking-wider">{t('secContact')}</h3>
+                </div>
+                
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-1.5">
+                    <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <User className="h-4 w-4 text-[#F48B7D]" /> {t('fullName')}
+                    </label>
+                    <input 
+                      type="text" 
+                      name="name" 
+                      required 
+                      value={form.name}
+                      onChange={handleInputChange}
+                      placeholder="Sara Virtanen"
+                      className="w-full px-4 py-3.5 rounded-xl border border-orange-100 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/20 focus:border-[#F48B7D] bg-white text-sm sm:text-base text-gray-800"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <Phone className="h-4 w-4 text-[#F48B7D]" /> {t('phone')}
+                    </label>
+                    <input 
+                      type="tel" 
+                      name="phone" 
+                      required 
+                      value={form.phone}
+                      onChange={handleInputChange}
+                      placeholder="+358 40 123 4567"
+                      className="w-full px-4 py-3.5 rounded-xl border border-orange-100 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/20 focus:border-[#F48B7D] bg-white text-sm sm:text-base text-gray-800"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <span className="text-[#F48B7D] text-lg">✉️</span> {t('email')}
+                  </label>
+                  <input 
+                    type="email" 
+                    name="email" 
+                    value={form.email}
+                    onChange={handleInputChange}
+                    placeholder="sara.virtanen@example.com (optional)"
+                    className="w-full px-4 py-3.5 rounded-xl border border-orange-100 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/20 focus:border-[#F48B7D] bg-white text-sm sm:text-base text-gray-800"
+                  />
+                </div>
+
+                <div className={`transition-all duration-300 overflow-hidden ${form.deliveryMethod === 'delivery' ? 'max-h-36 opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-2 pointer-events-none'}`}>
+                  <div className="space-y-1.5 pt-1">
+                    <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <MapPin className="h-4 w-4 text-[#F48B7D]" /> {t('address')}
+                    </label>
+                    <input 
+                      type="text" 
+                      name="address" 
+                      required={form.deliveryMethod === 'delivery'}
+                      value={form.address}
+                      onChange={handleInputChange}
+                      placeholder={t('addressPlaceholder')}
+                      className="w-full px-4 py-3.5 rounded-xl border border-orange-100 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/20 focus:border-[#F48B7D] bg-white text-sm sm:text-base text-gray-800"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Step 4: Date, time slots & delivery methods */}
+              <div id="date-time-section" className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5">
+                <div className="flex items-center gap-3 border-b border-orange-100 pb-3">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-100 text-[#F48B7D] text-sm font-bold">4</span>
                   <h3 className="font-bold text-base sm:text-lg text-[#F48B7D] uppercase tracking-wider">{t('secTime')}</h3>
                 </div>
                 
@@ -1042,31 +1069,8 @@ export default function App() {
                 </div>
               </div>
 
-              {}
-              {/* Step 4: Special dietary requests */}
-              <div className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5">
-                <div className="flex items-center gap-3 border-b border-orange-100 pb-3">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-100 text-[#F48B7D] text-sm font-bold">4</span>
-                  <h3 className="font-bold text-base sm:text-lg text-[#F48B7D] uppercase tracking-wider">{t('secDiet')}</h3>
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
-                    <MessageSquare className="h-4 w-4 text-[#F48B7D]" /> {t('dietSub')}
-                  </label>
-                  <textarea 
-                    name="specialRequests"
-                    value={form.specialRequests}
-                    onChange={handleInputChange}
-                    rows={3}
-                    placeholder="e.g. Please make the Chocolate Indulgence cookies lactose-free, or this is a birthday surprise gift box!"
-                    className="w-full px-4 py-3.5 rounded-xl border border-orange-100 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/20 focus:border-[#F48B7D] bg-white text-sm sm:text-base text-gray-800"
-                  />
-                </div>
-              </div>
-
-              {}
               {/* Step 5: Deliver configurations */}
-              <div className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5">
+              <div id="delivery-config-section" className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5">
                 <div className="flex items-center gap-3 border-b border-orange-100 pb-3">
                   <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-100 text-[#F48B7D] text-sm font-bold">5</span>
                   <h3 className="font-bold text-base sm:text-lg text-[#F48B7D] uppercase tracking-wider">{t('secDel')}</h3>
@@ -1115,7 +1119,7 @@ export default function App() {
               </div>
 
               {/* Checkout CTA block */}
-              <div className="bg-[#F48B7D] text-white p-6 sm:p-8 rounded-3xl text-center space-y-4 shadow-lg">
+              <div id="checkout-cta-section" className="bg-[#F48B7D] text-white p-6 sm:p-8 rounded-3xl text-center space-y-4 shadow-lg">
                 <div className="space-y-1">
                   <p className="text-xs uppercase font-bold tracking-widest opacity-80">
                     {t('estTotal')}
