@@ -363,6 +363,17 @@ export default function App() {
 
   const t = (key) => TRANSLATIONS[lang][key] || key;
 
+  // Set language from query parameter if present (?lang=fi or ?lang=en)
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const queryLang = params.get('lang');
+      if (queryLang === 'fi' || queryLang === 'en') {
+        setLang(queryLang);
+      }
+    }
+  }, []);
+
   // Sync date selection min attribute dynamically
   useEffect(() => {
     const today = new Date();
