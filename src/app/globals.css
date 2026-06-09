@@ -12,6 +12,19 @@
   --font-mono: var(--font-geist-mono);
 }
 
+@theme {
+  --animate-drive: drive 1.2s ease-in-out infinite;
+
+  @keyframes drive {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(6px);
+    }
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -32,4 +45,3 @@ input[type="submit"],
 [role="button"] {
   cursor: pointer !important;
 }
-

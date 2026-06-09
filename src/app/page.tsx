@@ -25,14 +25,14 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-amber-800 to-amber-950',
-    name: { en: 'Chocolate Indulgence (around 140g)', fi: 'Suklaaunelma (n. 140g)' },
+    name: { en: 'Chocolate Indulgence', fi: 'Suklaaunelma' },
     desc: { 
       en: 'A rich chocolate cookie with plenty of chocolate chunks and a gooey hazelnut cocoa center.',
       fi: 'Täyteläinen suklaakeksi, jossa on runsaasti suklaalohkoja ja pehmeä hasselpähkinäsuklaasydän.' 
     },
     ingredients: { 
-      en: ['Egg', 'Wheat', 'Milk', 'Hazelnut'],
-      fi: ['Kananmuna', 'Vehnä', 'Maito', 'Hasselpähkinä'] 
+      en: ['Egg', 'Wheat', 'Milk'],
+      fi: ['Kananmuna', 'Vehnä', 'Maito'] 
     }
   },
   { 
@@ -42,7 +42,7 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-amber-600 to-amber-800',
-    name: { en: 'Hazelnut Chocolate Chip (around 140g)', fi: 'Hasselpähkinä Suklaahippu (n. 140g)' },
+    name: { en: 'Hazelnut Chocolate Chip', fi: 'Hasselpähkinä Suklaahippu' },
     desc: { 
       en: 'Classic cookie dough with chocolate chips and a soft hazelnut spread filling.',
       fi: 'Klassinen keksitaikina suklaahipuilla ja pehmeällä hasselpähkinälevitetäytteellä.' 
@@ -59,7 +59,7 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-yellow-700 to-amber-800',
-    name: { en: 'Caramel Gold (around 140g)', fi: 'Karamelli Kulta (n. 140g)' },
+    name: { en: 'Caramel Gold', fi: 'Karamelli Kulta' },
     desc: { 
       en: 'A caramelized biscuit cookie with white chocolate chips and a soft, gooey caramel filling.',
       fi: 'Karamellisoitu keksi valkosuklaahipuilla ja pehmeällä, valuvalla karamellitäytteellä.' 
@@ -76,7 +76,7 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-rose-400 to-rose-600',
-    name: { en: 'Ruby Velvet Bliss (around 140g)', fi: 'Ruby Velvet Bliss (n. 140g)' },
+    name: { en: 'Ruby Velvet Bliss', fi: 'Ruby Velvet Bliss' },
     desc: { 
       en: 'Soft red cookie dough with white chocolate chips and a rich cream cheese filling in the center.',
       fi: 'Pehmeä punainen keksitaikina valkosuklaahipuilla ja täyteläisellä tuorejuustotäytteellä keskellä.' 
@@ -93,14 +93,14 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-orange-500 to-amber-600',
-    name: { en: 'Carrot Cake Cookie (around 140g)', fi: 'Porkkanakakku (n. 140g)' },
+    name: { en: 'Carrot Cake Cookie', fi: 'Porkkanakakku' },
     desc: { 
       en: 'A carrot cake-inspired cookie with toasted walnuts and a mildly spiced cream cheese filling.',
       fi: 'Porkkanakakusta inspiroitunut keksi paahdetuilla saksanpähkinöillä ja miedosti maustetulla tuorejuustotäytteellä.' 
     },
     ingredients: { 
-      en: ['Egg', 'Wheat', 'Milk', 'Walnut'],
-      fi: ['Kananmuna', 'Vehnä', 'Maito', 'Saksanpähkinä'] 
+      en: ['Egg', 'Wheat', 'Milk', 'Walnut', 'Carrot'],
+      fi: ['Kananmuna', 'Vehnä', 'Maito', 'Saksanpähkinä', 'Porkkana'] 
     }
   },
   { 
@@ -110,7 +110,7 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-amber-700 to-amber-900',
-    name: { en: 'Peanut Dusk (around 140g)', fi: 'Pähkinähämärä (n. 140g)' },
+    name: { en: 'Peanut Dusk', fi: 'Pähkinähämärä' },
     desc: { 
       en: 'A cookie with roasted peanuts, white and dark chocolate, and a rich peanut butter filling.',
       fi: 'Keksi paahdetuilla maapähkinöillä, valko- ja tummasuklaalla sekä täyteläisellä maapähkinävoitäytteellä.' 
@@ -127,14 +127,14 @@ const COOKIES = [
     origPrice: 4.50, 
     special: false,
     color: 'from-red-600 to-pink-700',
-    name: { en: 'Jam Swirl (around 140g)', fi: 'Hillokierre (n. 140g)' },
+    name: { en: 'Jam Swirl', fi: 'Hillokierre' },
     desc: { 
       en: 'A chocolate cookie filled with a soft cream cheese and jam filling, finished with raspberry jam.',
       fi: 'Suklaakeksi, jossa pehmeä tuorejuusto- ja hillotäyte, viimeistelty vadelmahillolla.' 
     },
     ingredients: { 
-      en: ['Egg', 'Wheat', 'Milk'],
-      fi: ['Kananmuna', 'Vehnä', 'Maito'] 
+      en: ['Egg', 'Wheat', 'Milk', 'Jam'],
+      fi: ['Kananmuna', 'Vehnä', 'Maito', 'Hillo'] 
     }
   },
   { 
@@ -144,7 +144,7 @@ const COOKIES = [
     origPrice: 0, 
     special: true,
     color: 'from-purple-400 to-pink-500',
-    name: { en: 'Funfetti Surprise (around 140g)', fi: 'Funfetti-yllätys (n. 140g)' },
+    name: { en: 'Funfetti Surprise', fi: 'Funfetti-yllätys' },
     desc: { 
       en: 'A colorful birthday-cake treat with crisp Smarties and a molten milk chocolate core. Auto-added on orders of 8+ cookies!',
       fi: 'Värikäs herkkukeksi täynnä Smarties-suklaarakeita ja maitosuklaasydän. Lisätään lahjaksi 8+ keksin laatikoihin!' 
@@ -173,7 +173,7 @@ const TRANSLATIONS = {
     badgeFresh: "Only pre-orders",
     storyTag: "Sara's Vision",
     storyTitle: "The Chemistry of Cozy Sweets",
-    storyBody1: "Velvet Crumbs was dreamed up by Sara, a food science expert who curates an exquisite palette of comforting flavors. By pairing precise baking temperatures with premium ingredients—from Lotus Biscoff cookie butter to rich Red Velvet and sweet swirls of jam—we bake cozy treats that bring absolute joy to your table",
+    storyBody1: "Velvet Crumbs was dreamed up by Sara, a food science expert who curates an exquisite palette of comforting flavors. By pairing precise baking science with premium ingredients from rich caramelized cookie butter and classic Red Velvet to sweet swirls of artisan jam we craft cozy treats designed to bring absolute joy to your table.",
     storyBody2: "We believe a cookie should be crunchy on the edge, cloud-soft throughout, and hide a luscious surprise inside. Every single dough batch is rolled individually, monitored meticulously, and delivered directly to you.",
     menuTag: "The Bakery Menu",
     menuTitle: "Our tempting flavours",
@@ -242,7 +242,7 @@ const TRANSLATIONS = {
     badgeFresh: "Only pre-orders",
     storyTag: "Saran Tarina",
     storyTitle: "Kun Tiede Kohtaa Makeat Herkut",
-    storyBody1: "Yhdistämällä tieteellinen tarkkuus ja kotileivonnan lämpö, luomme kotoisia herkkukoostumuksia, joissa maistuvat täyteläinen Lotus-keksivoi, samettinen valkosuklaa, aito hillo ja paahdetut pähkinät.",
+    storyBody1: "Velvet Crumbs on Saran, elintarviketieteen asiantuntijan, luomus. Yhdistämällä tarkan leivontatieteen ja ensiluokkaiset raaka-aineet – täyteläisestä karamellisoidusta keksivoista ja klassisesta Red Velvetistä käsintehtyjen hillojen makeisiin kierteisiin – leivomme kotoisia herkkuja, jotka tuovat aitoa iloa pöytääsi.",
     storyBody2: "Uskomme, että täydellisen keksin tulee olla reunoilta rapea, sisältä pilvenpehmeä ja täynnä suussa sulavaa täytettä. Jokainen taikinapallo muotoillaan ja paistetaan suurella sydämellä.",
     menuTag: "Valikoima",
     menuTitle: "Houkuttelevat makumme",
@@ -742,9 +742,14 @@ export default function App() {
                 <div className="p-6 flex-1 flex flex-col justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-xl font-bold text-[#2D2D2D] line-clamp-1">
-                        {c.name[lang]}
-                      </h3>
+                      <div className="space-y-0.5 min-w-0">
+                        <h3 className="text-lg sm:text-xl font-bold text-[#2D2D2D] truncate leading-tight">
+                          {c.name[lang]}
+                        </h3>
+                        <span className="text-[10px] sm:text-xs text-gray-400 font-semibold block">
+                          {lang === 'en' ? 'around 140g' : 'n. 140g'}
+                        </span>
+                      </div>
                     </div>
                     <p className="text-sm text-gray-600 leading-relaxed min-h-[5rem]">
                       {c.desc[lang]}
@@ -896,38 +901,47 @@ export default function App() {
                   {COOKIES.filter(c => !c.special).map(c => (
                     <div 
                       key={c.id}
-                      className="flex items-center justify-between p-3.5 bg-white rounded-2xl border border-orange-50 shadow-sm"
+                      className="flex items-start gap-3.5 p-3.5 bg-white rounded-2xl border border-orange-50 shadow-sm"
                     >
-                      <div className="flex items-center gap-3.5 min-w-0">
-                        <div className="h-14 w-14 rounded-xl overflow-hidden bg-orange-100 shrink-0">
-                          <img src={c.img} alt="" className="w-full h-full object-cover" />
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="font-bold text-xs min-[360px]:text-sm sm:text-base text-[#2D2D2D] line-clamp-2 leading-tight">{c.name[lang]}</h4>
-                          <span className="text-xs sm:text-sm text-[#F48B7D] font-bold block mt-0.5">
-                            {c.price.toFixed(2).replace('.', ',')} €
+                      <div className="h-17 w-17 rounded-xl overflow-hidden bg-orange-100 shrink-0">
+                        <img src={c.img} alt="" className="w-full h-full object-cover" />
+                      </div>
+                      
+                      <div className="min-w-0 flex-1 flex flex-col justify-between min-h-14">
+                        <div>
+                          <h4 className="font-bold text-xs min-[360px]:text-sm sm:text-base text-[#2D2D2D] leading-tight whitespace-normal">
+                            {c.name[lang]}
+                          </h4>
+                          <span className="text-[10px] text-gray-400 font-semibold block">
+                            {lang === 'en' ? 'around 140g' : 'n. 140g'}
                           </span>
                         </div>
-                      </div>
 
-                      <div className="flex items-center gap-0.5 shrink-0">
-                        <button 
-                          type="button" 
-                          onClick={() => updateQuantity(c.id, -1)}
-                          className="cursor-pointer h-8 w-8 rounded-full border border-rose-200 text-[#F48B7D] flex items-center justify-center font-bold hover:bg-[#F48B7D] hover:text-white transition-colors duration-150 text-sm"
-                        >
-                          <Minus className="h-3.5 w-3.5" />
-                        </button>
-                        <span className="w-6 text-center text-sm sm:text-base font-bold text-gray-800">
-                          {cart[c.id]}
-                        </span>
-                        <button 
-                          type="button" 
-                          onClick={() => updateQuantity(c.id, 1)}
-                          className="cursor-pointer h-8 w-8 rounded-full border border-rose-200 text-[#F48B7D] flex items-center justify-center font-bold hover:bg-[#F48B7D] hover:text-white transition-colors duration-150 text-sm"
-                        >
-                          <Plus className="h-3.5 w-3.5" />
-                        </button>
+                        <div className="flex items-center justify-between border-t border-orange-50/50">
+                          <span className="text-xs sm:text-sm text-[#F48B7D] font-bold">
+                            {c.price.toFixed(2).replace('.', ',')} €
+                          </span>
+                          
+                          <div className="flex items-center gap-0.5 shrink-0">
+                            <button 
+                              type="button" 
+                              onClick={() => updateQuantity(c.id, -1)}
+                              className="cursor-pointer h-7 w-7 rounded-full border border-rose-200 text-[#F48B7D] flex items-center justify-center font-bold hover:bg-[#F48B7D] hover:text-white transition-colors duration-150 text-xs"
+                            >
+                              <Minus className="h-3.5 w-3.5" />
+                            </button>
+                            <span className="w-5 text-center text-xs font-bold text-gray-800">
+                              {cart[c.id]}
+                            </span>
+                            <button 
+                              type="button" 
+                              onClick={() => updateQuantity(c.id, 1)}
+                              className="cursor-pointer h-7 w-7 rounded-full border border-rose-200 text-[#F48B7D] flex items-center justify-center font-bold hover:bg-[#F48B7D] hover:text-white transition-colors duration-150 text-xs"
+                            >
+                              <Plus className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1059,8 +1073,8 @@ export default function App() {
                 </div>
 
                 {isFreeDelivery && (
-                  <div className="bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs sm:text-sm font-bold px-4 py-3 rounded-xl flex items-center gap-2">
-                    <Truck className="h-4.5 w-4.5 text-emerald-600 animate-bounce" />
+                  <div className="bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs sm:text-sm font-bold px-4 py-3 rounded-xl flex items-center gap-3">
+                    <Truck className="h-4.5 w-4.5 text-emerald-600 animate-drive" />
                     <span>{t('delSweet')}</span>
                   </div>
                 )}
