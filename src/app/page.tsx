@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from 'react';
+import Image from 'next/image';
 import { 
   Truck, 
   Calendar, 
@@ -326,8 +327,27 @@ function Facebook({ className }) {
   );
 }
 
+function SafeImage({ src, alt, fallbackSrc = "/images/1.Chochlate_Indulgence.jpg", ...props }: any) {
+  const [imgSrc, setImgSrc] = useState(src);
+
+  useEffect(() => {
+    setImgSrc(src);
+  }, [src]);
+
+  return (
+    <Image
+      {...props}
+      src={imgSrc}
+      alt={alt}
+      onError={() => setImgSrc(fallbackSrc)}
+    />
+  );
+}
+
 export default function App() {
   const [lang, setLang] = useState('en');
+  const [navLogoError, setNavLogoError] = useState(false);
+  const [footerLogoError, setFooterLogoError] = useState(false);
   const [cart, setCart] = useState({
     ruby: 0,
     nutella: 0,
@@ -574,16 +594,18 @@ export default function App() {
         <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between gap-4 sm:gap-6">
           <a href="#" className="flex items-center gap-2 sm:gap-3 group">
             <div className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm transition-transform group-hover:rotate-6 duration-300">
-              <img 
-                src="/images/Logo.jpg" 
-                alt="Velvet Crumbs Logo" 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const target = e.target as any;
-                  target.style.display = 'none';
-                  target.parentNode.innerHTML = '<span class="text-xs font-serif font-bold text-[#F48B7D]">VC</span>';
-                }}
-              />
+              {navLogoError ? (
+                <span className="text-xs font-serif font-bold text-[#F48B7D]">VC</span>
+              ) : (
+                <Image 
+                  src="/images/Logo.jpg" 
+                  alt="Velvet Crumbs Logo" 
+                  width={64}
+                  height={64}
+                  className="w-full h-full object-cover"
+                  onError={() => setNavLogoError(true)}
+                />
+              )}
             </div>
             <span className="text-sm sm:text-xl font-bold tracking-tight text-[#F48B7D] font-serif leading-tight whitespace-normal">
               {t('brandName')}
@@ -679,14 +701,14 @@ export default function App() {
           <div className="md:col-span-5 flex justify-center relative">
             <div className="absolute inset-0 bg-gradient-to-tr from-rose-200 to-amber-200 blur-3xl opacity-40 rounded-full"></div>
             <div className="relative">
-              <div className="w-64 h-64 sm:w-80 sm:h-80 rounded-full border-8 border-white shadow-2xl overflow-hidden bg-orange-100 flex items-center justify-center">
-                <img 
+              <div className="w-64 h-64 sm:w-80 sm:h-80 rounded-full border-8 border-white shadow-2xl overflow-hidden bg-orange-100 relative flex items-center justify-center">
+                <SafeImage 
                   src="/images/Main.jpg" 
                   alt="Velvet Crumbs Baking Showcase" 
+                  fill
+                  sizes="(max-width: 640px) 256px, 320px"
                   className="w-full h-full object-cover transform hover:scale-105 duration-700 transition-transform" 
-                  onError={(e) => {
-                    (e.target as any).src = "/images/Logo.jpg";
-                  }}
+                  fallbackSrc="/images/Logo.jpg"
                 />
               </div>
               <div className="absolute -bottom-4 -right-2 bg-white border border-orange-100 rounded-2xl p-4 shadow-lg flex items-center gap-3">
@@ -744,13 +766,13 @@ export default function App() {
                 className="bg-white rounded-3xl border border-orange-100/60 overflow-hidden flex flex-col h-full hover:shadow-xl hover:border-[#F48B7D]/30 hover:-translate-y-1.5 transition-all duration-300"
               >
                 <div className="relative aspect-square w-full overflow-hidden bg-orange-50">
-                  <img 
+                  <SafeImage 
                     src={c.img} 
                     alt={c.name[lang]} 
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="w-full h-full object-cover hover:scale-105 duration-500 transition-transform" 
-                    onError={(e) => {
-                      (e.target as any).src = "/images/1.Chochlate_Indulgence.jpg";
-                    }}
+                    fallbackSrc="/images/1.Chochlate_Indulgence.jpg"
                   />
                   {c.special && (
                     <span className="absolute top-3 right-3 bg-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow">
@@ -852,7 +874,14 @@ export default function App() {
                       className="flex items-start gap-3.5 p-3.5 bg-white rounded-2xl border border-orange-50 shadow-sm"
                     >
                       <div className="size-16 rounded-xl overflow-hidden bg-orange-100 shrink-0">
-                        <img src={c.img} alt="" className="w-full h-full object-cover" />
+                        <SafeImage 
+                          src={c.img} 
+                          alt={c.name[lang]} 
+                          width={64}
+                          height={64}
+                          className="w-full h-full object-cover"
+                          fallbackSrc="/images/1.Chochlate_Indulgence.jpg"
+                        />
                       </div>
                       
                       <div className="min-w-0 flex-1 flex flex-col justify-between min-h-14">
@@ -1219,16 +1248,18 @@ export default function App() {
           <div className="md:col-span-5 space-y-4">
             <div className="flex items-center gap-3">
               <div className="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-full bg-white overflow-hidden flex items-center justify-center shadow-sm">
-                <img 
-                  src="/images/Logo.jpg" 
-                  alt="Velvet Crumbs Logo" 
-                  className="w-full h-full object-cover"
-                  onError={(e) => {
-                    const target = e.target as any;
-                    target.style.display = 'none';
-                    target.parentNode.innerHTML = '<span class="text-xs font-serif font-bold text-white">VC</span>';
-                  }}
-                />
+                {footerLogoError ? (
+                  <span className="text-xs font-serif font-bold text-[#F48B7D]">VC</span>
+                ) : (
+                  <Image 
+                    src="/images/Logo.jpg" 
+                    alt="Velvet Crumbs Logo" 
+                    width={64}
+                    height={64}
+                    className="w-full h-full object-cover"
+                    onError={() => setFooterLogoError(true)}
+                  />
+                )}
               </div>
               <span className="text-lg font-bold text-[#F48B7D] font-serif">
                 {t('brandName')}
