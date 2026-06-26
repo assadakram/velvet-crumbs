@@ -1,5 +1,5 @@
 import React from "react";
-import { Calendar, Clock } from "lucide-react";
+import { Calendar, Clock, Info } from "lucide-react";
 
 interface DateTimeSelectionProps {
   t: (key: string) => string;
@@ -20,6 +20,13 @@ export default function DateTimeSelection({
       <div className="flex items-center gap-3 border-b border-orange-100 pb-3">
         <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-100 text-[#F48B7D] text-sm font-bold">4</span>
         <h3 className="font-bold text-base sm:text-lg text-[#F48B7D] uppercase tracking-wider">{t('secTime')}</h3>
+      </div>
+
+      <div className="flex items-start gap-3 bg-rose-50/60 border border-rose-100 px-4 py-4 rounded-2xl">
+        <span className="shrink-0 flex items-center justify-center h-7 w-7 rounded-full bg-[#F48B7D]/10 text-[#F48B7D] mt-0.5">
+          <Info className="h-4 w-4" />
+        </span>
+        <p className="text-xs sm:text-sm text-rose-900/80 leading-relaxed font-medium">{t('bakingNotice')}</p>
       </div>
       
       <div className="grid sm:grid-cols-2 gap-4">
