@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { 
   Globe, 
@@ -11,54 +11,13 @@ import { TikTokIcon, Instagram, Facebook } from '../components/Icons';
 import Hero from '../components/Hero';
 import Story from '../components/Story';
 import CookieMenu from '../components/CookieMenu';
-import CookieSelection from '../components/checkout/CookieSelection';
-import SpecialRequests from '../components/checkout/SpecialRequests';
-import ContactDetails from '../components/checkout/ContactDetails';
-import DateTimeSelection from '../components/checkout/DateTimeSelection';
-import DeliveryMethod from '../components/checkout/DeliveryMethod';
-import CheckoutCTA from '../components/checkout/CheckoutCTA';
 
-import { COOKIES } from '../constants/cookies';
 import { TRANSLATIONS } from '../constants/translations';
-
-const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '358413170359';
 
 export default function App() {
   const [lang, setLang] = useState('en');
   const [navLogoError, setNavLogoError] = useState(false);
   const [footerLogoError, setFooterLogoError] = useState(false);
-  const [cart, setCart] = useState<Record<string, number>>({
-    ruby: 0,
-    nutella: 0,
-    choc: 0,
-    carrot: 0,
-    lotus: 0,
-    peanut: 0,
-    jam: 0
-  });
-
-  const [form, setForm] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    address: '',
-    date: '',
-    timeSlot: 'any',
-    specialRequests: '',
-    deliveryMethod: 'delivery' // 'delivery' or 'pickup'
-  });
-
-  const [validationError, setValidationError] = useState('');
-  const [isRedirecting, setIsRedirecting] = useState(false);
-  const [paymentAcknowledge, setPaymentAcknowledge] = useState(false);
-  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
-
-  const showToast = (message: string, type: 'success' | 'error') => {
-    setToast({ message, type });
-    setTimeout(() => {
-      setToast({ message: '', type: null });
-    }, 4000);
-  };
 
   const t = (key: string) => TRANSLATIONS[lang]?.[key] || key;
 
@@ -72,194 +31,6 @@ export default function App() {
       }
     }
   }, []);
-
-  // Sync date selection min attribute dynamically
-  useEffect(() => {
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const yyyy = today.getFullYear();
-    const minDate = `${yyyy}-${mm}-${dd}`;
-    
-    const dateInput = document.getElementById('fdate');
-    if (dateInput) {
-      dateInput.setAttribute('min', minDate);
-    }
-  }, []);
-
-  const { totalCookiesCount, cookiesCost, isFreeDelivery, deliveryFee, finalTotal, funfettiBonusCount } = useMemo(() => {
-    let count = 0;
-    let cost = 0;
-    
-    Object.keys(cart).forEach(id => {
-      const q = cart[id];
-      const cookieObj = COOKIES.find(c => c.id === id);
-      count += q;
-      cost += q * (cookieObj ? cookieObj.price : 0);
-    });
-
-    const freeDeliveryQualified = count >= 6;
-    let delFee = 0;
-    
-    if (form.deliveryMethod === 'delivery') {
-      delFee = freeDeliveryQualified ? 0 : 5.00;
-    }
-
-    const funfettiCount = Math.floor(count / 8);
-
-    return {
-      totalCookiesCount: count,
-      cookiesCost: cost,
-      isFreeDelivery: freeDeliveryQualified,
-      deliveryFee: delFee,
-      finalTotal: cost + delFee,
-      funfettiBonusCount: funfettiCount
-    };
-  }, [cart, form.deliveryMethod]);
-
-  const updateQuantity = (id: string, change: number) => {
-    setCart(prev => {
-      const updatedVal = Math.max(0, Math.min(50, prev[id] + change));
-      return { ...prev, [id]: updatedVal };
-    });
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleOrderSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setValidationError('');
-
-    if (totalCookiesCount === 0) {
-      setValidationError(t('alertValidCart'));
-      document.getElementById('cookie-selection-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-
-    if (!form.name.trim() || !form.phone.trim()) {
-      setValidationError(t('alertValidFields'));
-      document.getElementById('contact-details-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-
-    if (!form.date) {
-      setValidationError(t('alertValidFields'));
-      document.getElementById('date-time-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-
-    if (form.deliveryMethod === 'delivery' && !form.address.trim()) {
-      setValidationError(t('alertValidAddress'));
-      document.getElementById('contact-details-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-
-    if (!paymentAcknowledge) {
-      setValidationError(t('alertPayAck'));
-      document.getElementById('checkout-cta-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      return;
-    }
-
-    let cookieLines = '';
-    Object.keys(cart).forEach(id => {
-      const qty = cart[id];
-      if (qty > 0) {
-        const cookieObj = COOKIES.find(c => c.id === id);
-        if (cookieObj) {
-          cookieLines += `• ${cookieObj.name[lang]} x ${qty} (${(qty * cookieObj.price).toFixed(2)} €)\n`;
-        }
-      }
-    });
-
-    if (funfettiBonusCount > 0) {
-      const funfettiObj = COOKIES.find(c => c.id === 'funfetti');
-      if (funfettiObj) {
-        cookieLines += `🎁 ${funfettiObj.name[lang]} x ${funfettiBonusCount} (${t('bonusItem')})\n`;
-      }
-    }
-
-    const deliveryMethodLabel = form.deliveryMethod === 'delivery' 
-      ? `${t('delDirect')} (${t('delRegion')})` 
-      : `${t('delPickup')} (${t('delCenter')})`;
-
-    let timeSlotText = t('anyTime');
-    if (form.timeSlot === 'morning') timeSlotText = t('slotMorning');
-    if (form.timeSlot === 'noon') timeSlotText = t('slotNoon');
-    if (form.timeSlot === 'afternoon') timeSlotText = t('slotAfternoon');
-    if (form.timeSlot === 'evening') timeSlotText = t('slotEvening');
-
-    const title = lang === 'en' ? '🍪 *Velvet Crumbs Order Inquiry* 🍪' : '🍪 *Velvet Crumbs - Tilauskysely* 🍪';
-    const bottomGreet = lang === 'en' 
-      ? 'Hi Velvet Crumbs team! I have submitted this order. Please find my details and confirm availability. ✨'
-      : 'Hei Velvet Crumbs tiimi! Olen lähettänyt tilaukseni. Vahvistatteko saatavuuden ja toimitusajan. ✨';
-
-    const orderPayloadText = `${title}\n\n` +
-      `*${lang === 'en' ? 'Customer' : 'Asiakas'}:* ${form.name}\n` +
-      `*${lang === 'en' ? 'Phone' : 'Puhelin'}:* ${form.phone}\n` +
-      (form.deliveryMethod === 'delivery' ? `*${lang === 'en' ? 'Delivery Address' : 'Toimitusosoite'}:* ${form.address}\n` : '') +
-      `*${lang === 'en' ? 'Date' : 'Päivämäärä'}:* ${form.date}\n` +
-      `*${lang === 'en' ? 'Time slot' : 'Toivottu aika'}:* ${timeSlotText}\n` +
-      `*${lang === 'en' ? 'Delivery' : 'Toimitustapa'}:* ${deliveryMethodLabel}\n\n` +
-      `*${lang === 'en' ? 'Box Selection' : 'Laatikon sisältö'}:*\n${cookieLines}\n` +
-      (form.specialRequests ? `*${lang === 'en' ? 'Special wishes' : 'Toiveet'}:* ${form.specialRequests}\n\n` : '') +
-      `*${lang === 'en' ? 'Estimated Total' : 'Arvioitu summa'}:* ${finalTotal.toFixed(2).replace('.', ',')} €\n\n` +
-      `${bottomGreet}`;
-
-    const triggerWhatsAppRedirect = () => {
-      setTimeout(() => {
-        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderPayloadText)}`;
-        window.open(url, '_blank');
-        setIsRedirecting(false);
-      }, 1500);
-    };
-
-    setIsRedirecting(true);
-
-    try {
-      fetch('/api/order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          recipient: 'velvetcrumbs.fi@gmail.com',
-          name: form.name,
-          phone: form.phone,
-          email: form.email,
-          address: form.address,
-          deliveryMethod: form.deliveryMethod,
-          date: form.date,
-          timeSlot: timeSlotText,
-          orderLines: cookieLines,
-          specialRequests: form.specialRequests,
-          estimatedTotal: finalTotal
-        })
-      })
-      .then((res) => {
-        if (!res.ok) throw new Error("API failed");
-        showToast(
-          lang === 'en' ? "Order request logged! Redirecting to WhatsApp..." : "Tilauskysely kirjattu! Siirrytään WhatsAppiin...", 
-          'success'
-        );
-        triggerWhatsAppRedirect();
-      })
-      .catch(err => {
-        console.log('Order logging failed, fallback to WhatsApp only.', err);
-        showToast(
-          lang === 'en' ? "Email notice skipped, redirecting to WhatsApp..." : "Sähköposti-ilmoitus ohitettu, siirrytään WhatsAppiin...", 
-          'error'
-        );
-        triggerWhatsAppRedirect();
-      });
-    } catch (err) {
-      showToast(
-        lang === 'en' ? "Connecting to WhatsApp..." : "Yhdistetään WhatsAppiin...", 
-        'error'
-      );
-      triggerWhatsAppRedirect();
-    }
-  };
 
   return (
     <div className="min-h-screen bg-[#FFF9F5] text-[#2D2D2D] selection:bg-rose-100 selection:text-rose-900 overflow-x-hidden">
@@ -302,9 +73,6 @@ export default function App() {
             <a href="#cookies" className="text-sm font-medium hover:text-[#F48B7D] transition-colors duration-200">
               {t('navMenu')}
             </a>
-            <a href="#order" className="text-sm font-medium hover:text-[#F48B7D] transition-colors duration-200">
-              {t('navOrder')}
-            </a>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
@@ -318,7 +86,7 @@ export default function App() {
               <span className="sm:hidden">{lang === 'en' ? 'FI' : 'EN'}</span>
             </button>
             <a 
-              href="#order" 
+              href={`/order?lang=${lang}`} 
               className="cursor-pointer bg-[#F48B7D] text-white px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-md hover:bg-rose-400 active:scale-95 transition-all duration-200"
             >
               {t('navOrder')}
@@ -335,88 +103,6 @@ export default function App() {
 
       {/* SIGNATURE COOKIE MENU SECTION */}
       <CookieMenu lang={lang} t={t} />
-
-      {/* PRE-ORDER FORM SECTION */}
-      <section id="order" className="py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
-            <span className="text-[#F48B7D] text-xs font-bold uppercase tracking-widest block">
-              {t('orderTag')}
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-extrabold font-serif text-[#2D2D2D]">
-              {t('orderTitle')}
-            </h2>
-            <div className="inline-block bg-gradient-to-r from-rose-400 to-[#F48B7D] text-white px-6 py-2 rounded-2xl text-xs sm:text-sm font-bold shadow-md">
-              {t('orderPromo')}
-            </div>
-          </div>
-
-          <div id="order-builder-section" className="max-w-3xl mx-auto">
-            <form onSubmit={handleOrderSubmit} className="space-y-8">
-              
-              {/* Step 1: Cookie selection stepper */}
-              <CookieSelection
-                lang={lang}
-                t={t}
-                cart={cart}
-                updateQuantity={updateQuantity}
-                totalCookiesCount={totalCookiesCount}
-                funfettiBonusCount={funfettiBonusCount}
-              />
-
-              {/* Step 2: Special dietary requests */}
-              <SpecialRequests
-                t={t}
-                specialRequests={form.specialRequests}
-                handleInputChange={handleInputChange}
-              />
-
-              {/* Step 3: Contact details */}
-              <ContactDetails
-                t={t}
-                form={form}
-                handleInputChange={handleInputChange}
-              />
-
-              {/* Step 4: Date, time slots & delivery methods */}
-              <DateTimeSelection
-                t={t}
-                form={form}
-                handleInputChange={handleInputChange}
-              />
-
-              {/* Step 5: Deliver configurations */}
-              <DeliveryMethod
-                t={t}
-                isFreeDelivery={isFreeDelivery}
-                deliveryMethod={form.deliveryMethod}
-                setForm={setForm}
-              />
-
-              {/* Checkout CTA block */}
-              <CheckoutCTA
-                t={t}
-                finalTotal={finalTotal}
-                paymentAcknowledge={paymentAcknowledge}
-                setPaymentAcknowledge={setPaymentAcknowledge}
-                validationError={validationError}
-                isRedirecting={isRedirecting}
-                handleOrderSubmit={handleOrderSubmit}
-              />
-
-              {isRedirecting && (
-                <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-6 text-center space-y-3 animate-pulse max-w-md mx-auto">
-                  <span className="text-3xl block">🍪✨</span>
-                  <h4 className="font-bold text-emerald-800 text-lg">{t('waRedirectTitle')}</h4>
-                  <p className="text-xs sm:text-sm text-emerald-700 leading-relaxed">
-                    {t('waRedirectDesc')}
-                  </p>
-                </div>
-              )}
-            </form>
-          </div>
-        </div>
-      </section>
 
       {/* FOOTER SECTION */}
       <footer className="bg-white border-t border-orange-100/50 py-16">
@@ -499,18 +185,6 @@ export default function App() {
           </div>
         </div>
       </footer>
-
-      {/* Toast Notification */}
-      {toast.type && (
-        <div className={`fixed bottom-5 right-5 z-50 flex items-center gap-2 px-5 py-3.5 rounded-2xl shadow-xl border text-sm font-bold animate-bounce ${
-          toast.type === 'success' 
-            ? 'bg-emerald-50 border-emerald-100 text-emerald-800' 
-            : 'bg-rose-50 border-rose-100 text-rose-800'
-        }`}>
-          <span>{toast.type === 'success' ? '✨' : '⚠️'}</span>
-          <span>{toast.message}</span>
-        </div>
-      )}
     </div>
   );
 }
