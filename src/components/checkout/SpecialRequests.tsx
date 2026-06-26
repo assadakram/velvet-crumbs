@@ -1,5 +1,5 @@
 import React from "react";
-import { MessageSquare } from "lucide-react";
+import { MessageSquare, AlertTriangle } from "lucide-react";
 
 interface SpecialRequestsProps {
   t: (key: string) => string;
@@ -22,6 +22,10 @@ export default function SpecialRequests({
         <label className="text-xs sm:text-sm font-bold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
           <MessageSquare className="h-4 w-4 text-[#F48B7D]" /> {t('dietSub')}
         </label>
+        <div className="flex items-center gap-3 bg-[#FFF9F5] border border-orange-100 px-4 py-3 rounded-xl">
+          <AlertTriangle className="h-4 w-4 shrink-0 text-[#F48B7D]" />
+          <p className="text-xs sm:text-sm text-orange-950/70 font-semibold leading-snug">{t('nutWarning')}</p>
+        </div>
         <textarea 
           name="specialRequests"
           value={specialRequests}
