@@ -1,13 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
+import { put, list } from '@vercel/blob';
 
-// Store the settings JSON file in the project root under /data
-const DATA_FILE = path.join(process.cwd(), 'data', 'preorder-settings.json');
-
-// Default settings if file doesn't exist yet
+// Default settings used if the file hasn't been created yet on Vercel Blob
 const DEFAULT_SETTINGS = {
   isPaused: false,
   resumeDate: null,
@@ -18,18 +14,34 @@ const DEFAULT_SETTINGS = {
 
 async function readSettings() {
   try {
-    const raw = await fs.readFile(DATA_FILE, 'utf-8');
-    return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
-  } catch {
-    // File doesn't exist yet — return defaults
-    return DEFAULT_SETTINGS;
+    const { blobs } = await list({ prefix: 'preorder-settings.json' });
+    const settingsBlob = blobs.find((b) => b.pathname === 'preorder-settings.json');
+    if (settingsBlob) {
+      const res = await fetch(settingsBlob.url, { 
+        cache: 'no-store',
+        headers: {
+          'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        return { ...DEFAULT_SETTINGS, ...data };
+      }
+    }
+  } catch (err) {
+    console.error('Failed to read settings from Vercel Blob:', err);
   }
+  return DEFAULT_SETTINGS;
 }
 
 async function writeSettings(data: typeof DEFAULT_SETTINGS) {
-  const dir = path.dirname(DATA_FILE);
-  await fs.mkdir(dir, { recursive: true });
-  await fs.writeFile(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  await put('preorder-settings.json', JSON.stringify(data, null, 2), {
+    access: 'private', // Match your store's private config
+    addRandomSuffix: false,
+    allowOverwrite: true, // Allow overwriting the existing file
+    contentType: 'application/json',
+    cacheControlMaxAge: 0, // Disable edge caching for live settings updates
+  });
 }
 
 async function verifyAuth(req: NextRequest): Promise<boolean> {
