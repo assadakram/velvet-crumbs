@@ -19,8 +19,7 @@ import CheckoutCTA from '../../components/checkout/CheckoutCTA';
 
 import { COOKIES } from '../../constants/cookies';
 import { TRANSLATIONS } from '../../constants/translations';
-import { sanityClient } from '../../lib/sanityClient';
-import { PREORDER_SETTINGS_QUERY, type PreorderSettings } from '../../lib/preorderQueries';
+import type { PreorderSettings } from '../../lib/preorderQueries';
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '358413170359';
 
@@ -129,14 +128,15 @@ export default function OrderPage() {
 
   const resumeStr = useMemo(() => {
     if (!resumeDateObj) return '';
-    const datePart = resumeDateObj.toLocaleDateString(lang === 'fi' ? 'fi-FI' : 'en-GB', { 
+    const datePart = resumeDateObj.toLocaleDateString(lang === 'fi' ? 'fi-FI' : 'en-US', { 
       weekday: 'long', 
       day: 'numeric', 
       month: 'long' 
     });
-    const timePart = resumeDateObj.toLocaleTimeString(lang === 'fi' ? 'fi-FI' : 'en-GB', { 
-      hour: '2-digit', 
-      minute: '2-digit' 
+    const timePart = resumeDateObj.toLocaleTimeString(lang === 'fi' ? 'fi-FI' : 'en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: lang !== 'fi'
     });
     const capitalizedDate = datePart.charAt(0).toUpperCase() + datePart.slice(1);
     if (lang === 'fi') {
@@ -182,18 +182,15 @@ export default function OrderPage() {
     }
   }, []);
 
-  // Fetch pre-order settings from Sanity (graceful — fails silently if not configured)
+  // Fetch pre-order settings from local JSON file API
   useEffect(() => {
-    if (!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) return;
-    console.log("Fetching pre-order settings from Sanity...");
-    sanityClient
-      .fetch(PREORDER_SETTINGS_QUERY)
+    fetch('/api/preorder-settings')
+      .then((res) => res.json())
       .then((data: PreorderSettings) => {
-        console.log("Sanity pre-order settings fetched successfully:", data);
         if (data) setPreorderSettings(data);
       })
       .catch((err) => {
-        console.error("Failed to fetch pre-order settings from Sanity:", err);
+        console.error('Failed to fetch pre-order settings:', err);
       });
   }, []);
 
