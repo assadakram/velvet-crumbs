@@ -24,6 +24,50 @@ import { PREORDER_SETTINGS_QUERY, type PreorderSettings } from '../../lib/preord
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '358413170359';
 
+/**
+ * Helper to parse a date and time string in the Europe/Helsinki timezone
+ * and return a standard JavaScript Date object.
+ */
+function parseHelsinkiTime(dateStr: string, timeStr: string): Date {
+  try {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const [hour, minute] = timeStr.split(':').map(Number);
+
+    // Create UTC base date
+    const utcDate = new Date(Date.UTC(year, month - 1, day, hour, minute));
+
+    // Calculate Helsinki offset relative to UTC for this specific date
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Helsinki',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      hour12: false,
+    });
+
+    const parts = formatter.formatToParts(utcDate);
+    const partVal = (type: string) => Number(parts.find(p => p.type === type)?.value);
+    
+    const hYear = partVal('year');
+    const hMonth = partVal('month');
+    const hDay = partVal('day');
+    const hHour = partVal('hour');
+    const hMinute = partVal('minute');
+
+    const helsinkiLocalAsUtc = Date.UTC(hYear, hMonth - 1, hDay, hHour, hMinute);
+    const offset = helsinkiLocalAsUtc - utcDate.getTime();
+
+    // Return standard UTC date corresponding to the target time in Helsinki
+    return new Date(utcDate.getTime() - offset);
+  } catch (e) {
+    console.error("Failed to parse Helsinki timezone date", e);
+    return new Date(`${dateStr}T${timeStr}:00`);
+  }
+}
+
 export default function OrderPage() {
   const [lang, setLang] = useState('en');
   const [navLogoError, setNavLogoError] = useState(false);
@@ -54,13 +98,20 @@ export default function OrderPage() {
   const [paymentAcknowledge, setPaymentAcknowledge] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
   const [preorderSettings, setPreorderSettings] = useState<PreorderSettings | null>(null);
+  const [serverOffset, setServerOffset] = useState<number>(0);
 
   const resumeDateObj = useMemo(() => {
     if (!preorderSettings || !preorderSettings.resumeDate) return null;
     const timeStr = preorderSettings.resumeTime && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(preorderSettings.resumeTime.trim())
       ? preorderSettings.resumeTime.trim()
       : '00:00';
-    return new Date(`${preorderSettings.resumeDate}T${timeStr}:00`);
+    
+    // === TOGGLE TIMING MODE FOR TESTING ===
+    // Option A: Local Browser Time (Pakistan timing, etc. for local testing)
+    // return new Date(`${preorderSettings.resumeDate}T${timeStr}:00`);
+    
+    // Option B: Helsinki Time (Production mode)
+    return parseHelsinkiTime(preorderSettings.resumeDate, timeStr);
   }, [preorderSettings]);
 
   const isCurrentlyPaused = useMemo(() => {
@@ -68,13 +119,13 @@ export default function OrderPage() {
     if (!preorderSettings.isPaused) return false;
     
     if (resumeDateObj) {
-      const now = new Date();
+      const now = new Date(Date.now() + serverOffset);
       if (now >= resumeDateObj) {
         return false;
       }
     }
     return true;
-  }, [preorderSettings, resumeDateObj]);
+  }, [preorderSettings, resumeDateObj, serverOffset]);
 
   const resumeStr = useMemo(() => {
     if (!resumeDateObj) return '';
@@ -146,9 +197,25 @@ export default function OrderPage() {
       });
   }, []);
 
+  // Fetch server time on mount to calculate clock offset
+  useEffect(() => {
+    fetch('/api/time')
+      .then(res => res.json())
+      .then(data => {
+        if (data.serverTime) {
+          const clientNow = Date.now();
+          const serverNow = new Date(data.serverTime).getTime();
+          setServerOffset(serverNow - clientNow);
+        }
+      })
+      .catch(err => {
+        console.error("Failed to fetch server time:", err);
+      });
+  }, []);
+
   // Sync date selection min attribute dynamically
   useEffect(() => {
-    const today = new Date();
+    const today = new Date(Date.now() + serverOffset);
     const dd = String(today.getDate()).padStart(2, '0');
     const mm = String(today.getMonth() + 1).padStart(2, '0');
     const yyyy = today.getFullYear();
@@ -158,7 +225,7 @@ export default function OrderPage() {
     if (dateInput) {
       dateInput.setAttribute('min', minDate);
     }
-  }, []);
+  }, [serverOffset]);
 
   const { totalCookiesCount, cookiesCost, isFreeDelivery, deliveryFee, finalTotal, funfettiBonusCount } = useMemo(() => {
     let count = 0;
