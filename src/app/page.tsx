@@ -11,6 +11,7 @@ import { TikTokIcon, Instagram, Facebook } from '../components/Icons';
 import Hero from '../components/Hero';
 import Story from '../components/Story';
 import CookieMenu from '../components/CookieMenu';
+import OrderSection from '../components/OrderSection';
 
 import { TRANSLATIONS } from '../constants/translations';
 
@@ -86,7 +87,7 @@ export default function App() {
               <span className="sm:hidden">{lang === 'en' ? 'FI' : 'EN'}</span>
             </button>
             <a 
-              href={`/order?lang=${lang}`} 
+              href="#order"
               className="cursor-pointer bg-[#F48B7D] text-white px-3.5 py-1.5 sm:px-5 sm:py-2 rounded-full text-xs sm:text-sm font-bold shadow-md hover:bg-rose-400 active:scale-95 transition-all duration-200"
             >
               {t('navOrder')}
@@ -103,6 +104,9 @@ export default function App() {
 
       {/* SIGNATURE COOKIE MENU SECTION */}
       <CookieMenu lang={lang} t={t} />
+
+      {/* ORDER SECTION */}
+      <OrderSection lang={lang} t={t} />
 
       {/* FOOTER SECTION */}
       <footer className="bg-white border-t border-orange-100/50 py-16">
