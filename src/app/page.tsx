@@ -68,6 +68,20 @@ export default function App() {
     }
   }, []);
 
+  // Auto-scroll to menu on page load
+  useEffect(() => {
+    if (typeof window !== 'undefined' && !window.location.hash) {
+      setTimeout(() => {
+        const menuEl = document.getElementById('menu');
+        if (menuEl) {
+          const yOffset = 100; // Scroll a little more below
+          const y = menuEl.getBoundingClientRect().top + window.scrollY + yOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      }, 300); // slight delay to allow layout to settle
+    }
+  }, []);
+
   // Sync date selection min attribute dynamically
   useEffect(() => {
     const today = new Date();
