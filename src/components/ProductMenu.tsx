@@ -1,44 +1,74 @@
-import React from "react";
+import React, { useState } from "react";
 import { COOKIES } from "../constants/cookies";
+import { BROWNIES, BOXES } from "../constants/brownies";
 import SafeImage from "./SafeImage";
 
-interface CookieMenuProps {
+interface ProductMenuProps {
   lang: string;
   t: (key: string) => string;
 }
 
-export default function CookieMenu({ lang, t }: CookieMenuProps) {
+export default function ProductMenu({ lang, t }: ProductMenuProps) {
+  const [activeTab, setActiveTab] = useState<'cookies' | 'brownies' | 'boxes'>('cookies');
+
+  let currentItems: any[] = [];
+  if (activeTab === 'cookies') currentItems = COOKIES;
+  if (activeTab === 'brownies') currentItems = BROWNIES;
+  if (activeTab === 'boxes') currentItems = BOXES;
+
   return (
-    <section id="cookies" className="py-20 bg-gradient-to-b from-[#FFF9F5] to-white">
+    <section id="menu" className="py-20 bg-gradient-to-b from-[#FFF9F5] to-white scroll-mt-24">
       <div className="max-w-6xl mx-auto px-4">
-        <div className="text-center max-w-2xl mx-auto mb-16 space-y-3">
+        <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
           <span className="text-[#F48B7D] text-xs font-bold uppercase tracking-widest block">
             {t('menuTag')}
           </span>
           <h2 className="text-3xl sm:text-4xl font-extrabold font-serif text-[#2D2D2D]">
             {t('menuTitle')}
           </h2>
-          <div className="inline-block bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-6 py-2.5 rounded-full shadow-sm">
+          <div className="inline-block bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-6 py-2.5 rounded-full shadow-sm mt-4">
             {t('menuPromo')}
           </div>
         </div>
 
+        {/* Category Tabs */}
+        <div className="flex justify-center gap-2 sm:gap-4 mb-12">
+          <button
+            onClick={() => setActiveTab('cookies')}
+            className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${activeTab === 'cookies' ? 'bg-[#F48B7D] text-white shadow-md' : 'bg-white text-gray-500 hover:bg-orange-50 border border-orange-100'}`}
+          >
+            {t('tabCookies')}
+          </button>
+          <button
+            onClick={() => setActiveTab('brownies')}
+            className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${activeTab === 'brownies' ? 'bg-[#F48B7D] text-white shadow-md' : 'bg-white text-gray-500 hover:bg-orange-50 border border-orange-100'}`}
+          >
+            {t('tabBrownies')}
+          </button>
+          <button
+            onClick={() => setActiveTab('boxes')}
+            className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${activeTab === 'boxes' ? 'bg-[#F48B7D] text-white shadow-md' : 'bg-white text-gray-500 hover:bg-orange-50 border border-orange-100'}`}
+          >
+            {t('tabBoxes')}
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-          {COOKIES.map(c => (
+          {currentItems.map(item => (
             <div 
-              key={c.id}
+              key={item.id}
               className="bg-white rounded-3xl border border-orange-100/60 overflow-hidden flex flex-col h-full hover:shadow-xl hover:border-[#F48B7D]/30 hover:-translate-y-1.5 transition-all duration-300"
             >
               <div className="relative aspect-square w-full overflow-hidden bg-orange-50">
                 <SafeImage 
-                  src={c.img} 
-                  alt={c.name[lang]} 
+                  src={item.img} 
+                  alt={item.name[lang as 'en' | 'fi']} 
                   fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="w-full h-full object-cover hover:scale-105 duration-500 transition-transform" 
                   fallbackSrc="/images/1.Chochlate_Indulgence.jpg"
                 />
-                {c.special && (
+                {item.special && (
                   <span className="absolute top-3 right-3 bg-purple-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow">
                     Bonus
                   </span>
@@ -50,15 +80,17 @@ export default function CookieMenu({ lang, t }: CookieMenuProps) {
                   <div className="flex items-center justify-between">
                     <div className="space-y-0.5 min-w-0">
                       <h3 className="text-lg sm:text-xl font-bold text-[#2D2D2D] truncate leading-tight">
-                        {c.name[lang]}
+                        {item.name[lang as 'en' | 'fi']}
                       </h3>
-                      <span className="text-[10px] sm:text-xs text-gray-400 font-semibold block">
-                        {lang === 'en' ? 'around 140g' : 'n. 140g'}
-                      </span>
+                      {activeTab === 'cookies' && (
+                        <span className="text-[10px] sm:text-xs text-gray-400 font-semibold block">
+                          {lang === 'en' ? 'around 140g' : 'n. 140g'}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <p className="text-sm text-gray-600 leading-relaxed">
-                    {c.desc[lang]}
+                    {item.desc[lang as 'en' | 'fi']}
                   </p>
                 </div>
 
@@ -68,7 +100,7 @@ export default function CookieMenu({ lang, t }: CookieMenuProps) {
                       {t('keyIngredients')}
                     </span>
                     <div className="flex flex-wrap gap-1.5">
-                      {c.ingredients[lang].map((ing, idx) => (
+                      {item.ingredients[lang as 'en' | 'fi'].map((ing: string, idx: number) => (
                         <span 
                           key={idx}
                           className="bg-rose-50 text-[#c0533e] text-xs font-semibold px-2.5 py-1 rounded-full uppercase tracking-wide"
@@ -80,18 +112,20 @@ export default function CookieMenu({ lang, t }: CookieMenuProps) {
                   </div>
 
                   <div className="flex items-baseline gap-2">
-                    {c.special ? (
+                    {item.special ? (
                       <span className="text-xs font-bold text-purple-600 bg-purple-50 px-2.5 py-1 rounded-lg">
                         {t('bonusItem')}
                       </span>
                     ) : (
                       <>
                         <span className="text-xl font-bold text-[#F48B7D]">
-                          {c.price.toFixed(2).replace('.', ',')} €
+                          {item.price.toFixed(2).replace('.', ',')} €
                         </span>
-                        <span className="text-xs text-gray-400 line-through">
-                          {c.origPrice.toFixed(2).replace('.', ',')} €
-                        </span>
+                        {item.origPrice > item.price && (
+                          <span className="text-xs text-gray-400 line-through">
+                            {item.origPrice.toFixed(2).replace('.', ',')} €
+                          </span>
+                        )}
                       </>
                     )}
                   </div>

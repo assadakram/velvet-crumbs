@@ -10,8 +10,8 @@ import {
 import { TikTokIcon, Instagram, Facebook } from '../components/Icons';
 import Hero from '../components/Hero';
 import Story from '../components/Story';
-import CookieMenu from '../components/CookieMenu';
-import CookieSelection from '../components/checkout/CookieSelection';
+import ProductMenu from '../components/ProductMenu';
+import ProductSelection from '../components/checkout/ProductSelection';
 import SpecialRequests from '../components/checkout/SpecialRequests';
 import ContactDetails from '../components/checkout/ContactDetails';
 import DateTimeSelection from '../components/checkout/DateTimeSelection';
@@ -19,7 +19,10 @@ import DeliveryMethod from '../components/checkout/DeliveryMethod';
 import CheckoutCTA from '../components/checkout/CheckoutCTA';
 
 import { COOKIES } from '../constants/cookies';
+import { BROWNIES, BOXES } from '../constants/brownies';
 import { TRANSLATIONS } from '../constants/translations';
+
+const ALL_PRODUCTS = [...COOKIES, ...BROWNIES, ...BOXES];
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '358413170359';
 
@@ -27,15 +30,7 @@ export default function App() {
   const [lang, setLang] = useState('en');
   const [navLogoError, setNavLogoError] = useState(false);
   const [footerLogoError, setFooterLogoError] = useState(false);
-  const [cart, setCart] = useState<Record<string, number>>({
-    ruby: 0,
-    nutella: 0,
-    choc: 0,
-    carrot: 0,
-    lotus: 0,
-    peanut: 0,
-    jam: 0
-  });
+  const [cart, setCart] = useState<Record<string, number>>({});
 
   const [form, setForm] = useState({
     name: '',
@@ -93,12 +88,12 @@ export default function App() {
     
     Object.keys(cart).forEach(id => {
       const q = cart[id];
-      const cookieObj = COOKIES.find(c => c.id === id);
+      const productObj = ALL_PRODUCTS.find(c => c.id === id);
       count += q;
-      cost += q * (cookieObj ? cookieObj.price : 0);
+      cost += q * (productObj ? productObj.price : 0);
     });
 
-    const freeDeliveryQualified = count >= 6;
+    const freeDeliveryQualified = cost >= 25;
     let delFee = 0;
     
     if (form.deliveryMethod === 'delivery') {
@@ -119,7 +114,8 @@ export default function App() {
 
   const updateQuantity = (id: string, change: number) => {
     setCart(prev => {
-      const updatedVal = Math.max(0, Math.min(50, prev[id] + change));
+      const current = prev[id] || 0;
+      const updatedVal = Math.max(0, Math.min(50, current + change));
       return { ...prev, [id]: updatedVal };
     });
   };
@@ -167,17 +163,17 @@ export default function App() {
     Object.keys(cart).forEach(id => {
       const qty = cart[id];
       if (qty > 0) {
-        const cookieObj = COOKIES.find(c => c.id === id);
-        if (cookieObj) {
-          cookieLines += `• ${cookieObj.name[lang]} x ${qty} (${(qty * cookieObj.price).toFixed(2)} €)\n`;
+        const productObj = ALL_PRODUCTS.find(c => c.id === id);
+        if (productObj) {
+          cookieLines += `• ${productObj.name[lang as 'en' | 'fi']} x ${qty} (${(qty * productObj.price).toFixed(2)} €)\n`;
         }
       }
     });
 
     if (funfettiBonusCount > 0) {
-      const funfettiObj = COOKIES.find(c => c.id === 'funfetti');
+      const funfettiObj = ALL_PRODUCTS.find(c => c.id === 'funfetti');
       if (funfettiObj) {
-        cookieLines += `🎁 ${funfettiObj.name[lang]} x ${funfettiBonusCount} (${t('bonusItem')})\n`;
+        cookieLines += `🎁 ${funfettiObj.name[lang as 'en' | 'fi']} x ${funfettiBonusCount} (${t('bonusItem')})\n`;
       }
     }
 
@@ -299,9 +295,22 @@ export default function App() {
             <a href="#story" className="text-sm font-medium hover:text-[#F48B7D] transition-colors duration-200">
               {t('navStory')}
             </a>
-            <a href="#cookies" className="text-sm font-medium hover:text-[#F48B7D] transition-colors duration-200">
-              {t('navMenu')}
-            </a>
+            <div className="relative group">
+              <button className="text-sm font-medium hover:text-[#F48B7D] transition-colors duration-200 flex items-center gap-1">
+                {t('navMenu')}
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </button>
+              <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300 z-50">
+                <div className="bg-white rounded-xl shadow-xl border border-orange-100 py-2 w-48 flex flex-col">
+                  <a href="#menu" className="px-4 py-2.5 text-sm hover:bg-orange-50 hover:text-[#F48B7D] transition-colors whitespace-nowrap text-center">
+                    {t('navStuffedCookies')}
+                  </a>
+                  <a href="#menu" className="px-4 py-2.5 text-sm hover:bg-orange-50 hover:text-[#F48B7D] transition-colors whitespace-nowrap text-center border-t border-gray-50">
+                    {t('navBrownies')}
+                  </a>
+                </div>
+              </div>
+            </div>
             <a href="#order" className="text-sm font-medium hover:text-[#F48B7D] transition-colors duration-200">
               {t('navOrder')}
             </a>
@@ -334,7 +343,7 @@ export default function App() {
       <Story t={t} />
 
       {/* SIGNATURE COOKIE MENU SECTION */}
-      <CookieMenu lang={lang} t={t} />
+      <ProductMenu lang={lang} t={t} />
 
       {/* PRE-ORDER FORM SECTION */}
       <section id="order" className="py-20 bg-white">
@@ -355,13 +364,12 @@ export default function App() {
             <form onSubmit={handleOrderSubmit} className="space-y-8">
               
               {/* Step 1: Cookie selection stepper */}
-              <CookieSelection
-                lang={lang}
-                t={t}
-                cart={cart}
-                updateQuantity={updateQuantity}
-                totalCookiesCount={totalCookiesCount}
-                funfettiBonusCount={funfettiBonusCount}
+              <ProductSelection 
+                lang={lang} 
+                t={t} 
+                cart={cart} 
+                updateQuantity={updateQuantity} 
+                funfettiBonusCount={funfettiBonusCount} 
               />
 
               {/* Step 2: Special dietary requests */}
