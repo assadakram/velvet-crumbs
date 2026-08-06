@@ -68,19 +68,7 @@ export default function App() {
     }
   }, []);
 
-  // Auto-scroll to menu on page load
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !window.location.hash) {
-      setTimeout(() => {
-        const menuEl = document.getElementById('menu');
-        if (menuEl) {
-          const yOffset = 100; // Scroll a little more below
-          const y = menuEl.getBoundingClientRect().top + window.scrollY + yOffset;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
-      }, 300); // slight delay to allow layout to settle
-    }
-  }, []);
+  // Auto-scroll on page load removed as requested by user
 
   // Sync date selection min attribute dynamically
   useEffect(() => {
@@ -316,11 +304,14 @@ export default function App() {
               </button>
               <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 translate-y-2 pointer-events-none group-hover:opacity-100 group-hover:translate-y-0 group-hover:pointer-events-auto transition-all duration-300 z-50">
                 <div className="bg-white rounded-xl shadow-xl border border-orange-100 py-2 w-48 flex flex-col">
-                  <a href="#menu" className="px-4 py-2.5 text-sm hover:bg-orange-50 hover:text-[#F48B7D] transition-colors whitespace-nowrap text-center">
+                  <a href="#cookies" className="px-4 py-2.5 text-sm hover:bg-orange-50 hover:text-[#F48B7D] transition-colors whitespace-nowrap text-center">
                     {t('navStuffedCookies')}
                   </a>
-                  <a href="#menu" className="px-4 py-2.5 text-sm hover:bg-orange-50 hover:text-[#F48B7D] transition-colors whitespace-nowrap text-center border-t border-gray-50">
+                  <a href="#brownies" className="px-4 py-2.5 text-sm hover:bg-orange-50 hover:text-[#F48B7D] transition-colors whitespace-nowrap text-center border-t border-gray-50">
                     {t('navBrownies')}
+                  </a>
+                  <a href="#boxes" className="px-4 py-2.5 text-sm hover:bg-orange-50 hover:text-[#F48B7D] transition-colors whitespace-nowrap text-center border-t border-gray-50">
+                    {t('tabBoxes')}
                   </a>
                 </div>
               </div>

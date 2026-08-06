@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { COOKIES } from "../constants/cookies";
 import { BROWNIES, BOXES } from "../constants/brownies";
 import SafeImage from "./SafeImage";
@@ -11,14 +11,44 @@ interface ProductMenuProps {
 export default function ProductMenu({ lang, t }: ProductMenuProps) {
   const [activeTab, setActiveTab] = useState<'cookies' | 'brownies' | 'boxes'>('cookies');
 
+  const handleTabClick = (tab: 'cookies' | 'brownies' | 'boxes') => {
+    setActiveTab(tab);
+    if (typeof window !== 'undefined') {
+      window.history.pushState(null, '', `#${tab}`);
+    }
+  };
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (['cookies', 'brownies', 'boxes'].includes(hash)) {
+        setActiveTab(hash as any);
+        
+        // Smoothly scroll to the menu, accounting for sticky navbar
+        setTimeout(() => {
+          const menuEl = document.getElementById('menu');
+          if (menuEl) {
+            const yOffset = 50; // Scroll a little more below (matches original page.tsx)
+            const y = menuEl.getBoundingClientRect().top + window.scrollY + yOffset;
+            window.scrollTo({ top: y, behavior: 'smooth' });
+          }
+        }, 300);
+      }
+    };
+
+    handleHashChange(); // Check on mount
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
   let currentItems: any[] = [];
   if (activeTab === 'cookies') currentItems = COOKIES;
   if (activeTab === 'brownies') currentItems = BROWNIES;
   if (activeTab === 'boxes') currentItems = BOXES;
 
   return (
-    <section id="menu" className="py-20 bg-gradient-to-b from-[#FFF9F5] to-white scroll-mt-24">
-      <div className="max-w-6xl mx-auto px-4">
+    <section id="menu" className="py-20 bg-gradient-to-b from-[#FFF9F5] to-white scroll-mt-24 relative">
+      <div className="max-w-6xl mx-auto px-4 relative z-10">
         <div className="text-center max-w-2xl mx-auto mb-12 space-y-3">
           <span className="text-[#F48B7D] text-xs font-bold uppercase tracking-widest block">
             {t('menuTag')}
@@ -34,19 +64,19 @@ export default function ProductMenu({ lang, t }: ProductMenuProps) {
         {/* Category Tabs */}
         <div className="flex justify-center gap-2 sm:gap-4 mb-12">
           <button
-            onClick={() => setActiveTab('cookies')}
+            onClick={() => handleTabClick('cookies')}
             className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${activeTab === 'cookies' ? 'bg-[#F48B7D] text-white shadow-md' : 'bg-white text-gray-500 hover:bg-orange-50 border border-orange-100'}`}
           >
             {t('tabCookies')}
           </button>
           <button
-            onClick={() => setActiveTab('brownies')}
+            onClick={() => handleTabClick('brownies')}
             className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${activeTab === 'brownies' ? 'bg-[#F48B7D] text-white shadow-md' : 'bg-white text-gray-500 hover:bg-orange-50 border border-orange-100'}`}
           >
             {t('tabBrownies')}
           </button>
           <button
-            onClick={() => setActiveTab('boxes')}
+            onClick={() => handleTabClick('boxes')}
             className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${activeTab === 'boxes' ? 'bg-[#F48B7D] text-white shadow-md' : 'bg-white text-gray-500 hover:bg-orange-50 border border-orange-100'}`}
           >
             {t('tabBoxes')}
