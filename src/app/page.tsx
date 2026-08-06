@@ -17,6 +17,7 @@ import ContactDetails from '../components/checkout/ContactDetails';
 import DateTimeSelection from '../components/checkout/DateTimeSelection';
 import DeliveryMethod from '../components/checkout/DeliveryMethod';
 import CheckoutCTA from '../components/checkout/CheckoutCTA';
+import OrderSuccessModal from '../components/checkout/OrderSuccessModal';
 
 import { COOKIES } from '../constants/cookies';
 import { BROWNIES, BOXES } from '../constants/brownies';
@@ -47,6 +48,8 @@ export default function App() {
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [paymentAcknowledge, setPaymentAcknowledge] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [whatsappUrl, setWhatsappUrl] = useState('');
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
@@ -206,14 +209,8 @@ export default function App() {
       `*${lang === 'en' ? 'Estimated Total' : 'Arvioitu summa'}:* ${finalTotal.toFixed(2).replace('.', ',')} €\n\n` +
       `${bottomGreet}`;
 
-    const triggerWhatsAppRedirect = () => {
-      setTimeout(() => {
-        const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderPayloadText)}`;
-        window.open(url, '_blank');
-        setIsRedirecting(false);
-      }, 1500);
-    };
-
+    const url = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(orderPayloadText)}`;
+    setWhatsappUrl(url);
     setIsRedirecting(true);
 
     try {
@@ -235,27 +232,26 @@ export default function App() {
         })
       })
       .then((res) => {
+        setIsRedirecting(false);
         if (!res.ok) throw new Error("API failed");
         showToast(
-          lang === 'en' ? "Order request logged! Redirecting to WhatsApp..." : "Tilauskysely kirjattu! Siirrytään WhatsAppiin...", 
+          lang === 'en' ? "Order request logged!" : "Tilauskysely kirjattu!", 
           'success'
         );
-        triggerWhatsAppRedirect();
+        setShowSuccessModal(true);
       })
       .catch(err => {
-        console.log('Order logging failed, fallback to WhatsApp only.', err);
+        console.log('Order logging failed.', err);
+        setIsRedirecting(false);
         showToast(
-          lang === 'en' ? "Email notice skipped, redirecting to WhatsApp..." : "Sähköposti-ilmoitus ohitettu, siirrytään WhatsAppiin...", 
+          lang === 'en' ? "Email notice failed, but you can still order via WhatsApp!" : "Sähköposti-ilmoitus epäonnistui, mutta voit silti tilata WhatsAppilla!", 
           'error'
         );
-        triggerWhatsAppRedirect();
+        setShowSuccessModal(true);
       });
     } catch (err) {
-      showToast(
-        lang === 'en' ? "Connecting to WhatsApp..." : "Yhdistetään WhatsAppiin...", 
-        'error'
-      );
-      triggerWhatsAppRedirect();
+      setIsRedirecting(false);
+      setShowSuccessModal(true);
     }
   };
 
@@ -524,6 +520,13 @@ export default function App() {
           <span>{toast.message}</span>
         </div>
       )}
+      {/* Order Success Modal */}
+      <OrderSuccessModal 
+        isOpen={showSuccessModal} 
+        onClose={() => setShowSuccessModal(false)} 
+        lang={lang} 
+        whatsappUrl={whatsappUrl} 
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@ export const BROWNIES = [
     price: 4.50,
     origPrice: 4.50,
     special: false,
+    vegan: true,
     color: 'from-amber-700 to-amber-900',
     name: { en: 'Choco Hazelnut Brownie', fi: 'Hasselpähkinä-Suklaa Brownie' },
     desc: {
@@ -29,8 +30,8 @@ export const BROWNIES = [
       fi: 'Ylellinen brownie-pohja, joka on kruunattu ensiluokkaisella, pehmeällä pistaasikermalla ja ripoteltu murskatuilla pistaaseilla. Kasvipohjaista luksusta jokaisella suupalalla.'
     },
     ingredients: {
-      en: ['Vegan cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Pistachio spread', 'Crushed pistachios', 'Vegan chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt'],
-      fi: ['Vegaaninen ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Pistaasilevite', 'Murskattu pistaasi', 'Vegaaninen suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola']
+      en: ['Vegan cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Pistachio spread', 'Crushed pistachios', 'Vegan chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt', 'Milk'],
+      fi: ['Vegaaninen ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Pistaasilevite', 'Murskattu pistaasi', 'Vegaaninen suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola', 'Maito']
     }
   },
   {
@@ -39,6 +40,7 @@ export const BROWNIES = [
     price: 4.50,
     origPrice: 4.50,
     special: false,
+    vegan: true,
     color: 'from-amber-600 to-amber-800',
     name: { en: 'Biscoff Melt Brownie', fi: 'Biscoff-Melt Brownie' },
     desc: {
@@ -56,6 +58,7 @@ export const BROWNIES = [
     price: 4.50,
     origPrice: 4.50,
     special: false,
+    vegan: true,
     color: 'from-stone-300 to-stone-500',
     name: { en: 'Coconut Crush Brownie', fi: 'Kookos-Crush Brownie' },
     desc: {
@@ -73,6 +76,7 @@ export const BROWNIES = [
     price: 4.50,
     origPrice: 4.50,
     special: false,
+    vegan: true,
     color: 'from-slate-700 to-slate-900',
     name: { en: 'Oreo Crunch Brownie', fi: 'Oreo-Crunch Brownie' },
     desc: {
@@ -90,6 +94,7 @@ export const BROWNIES = [
     price: 4.50,
     origPrice: 4.50,
     special: false,
+    vegan: true,
     color: 'from-rose-500 to-rose-700',
     name: { en: 'Raspberry Delight Brownie', fi: 'Vadelma-Delight Brownie' },
     desc: {

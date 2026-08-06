@@ -103,6 +103,11 @@ export default function ProductMenu({ lang, t }: ProductMenuProps) {
                     Bonus
                   </span>
                 )}
+                {item.vegan && (
+                  <span className="absolute top-3 left-3 bg-green-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow">
+                    Vegan
+                  </span>
+                )}
               </div>
 
               <div className="p-6 flex-1 flex flex-col">
