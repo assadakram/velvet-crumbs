@@ -193,7 +193,7 @@ export default function AdminPage() {
     setCouponsLoading(true);
     setCouponsError('');
     try {
-      const res = await fetch('/api/admin/coupons', { headers: { Authorization: `Bearer ${authSecret}` } });
+      const res = await fetch(`/api/admin/coupons?t=${Date.now()}`, { headers: { Authorization: `Bearer ${authSecret}` } });
       if (res.status === 401) { setCouponsError('Invalid admin secret for coupon API.'); return; }
       const data = await res.json();
       if (data.error) throw new Error(data.error);

@@ -18,7 +18,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid or expired promo code' }, { status: 404 });
     }
 
-    const response = await fetch(couponBlob.url, {
+    // Add timestamp to bypass Vercel Edge CDN cache
+    const response = await fetch(`${couponBlob.url}?t=${Date.now()}`, {
       cache: 'no-store',
       headers: {
         'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,

@@ -24,7 +24,8 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ coupons: [] });
     }
 
-    const response = await fetch(couponBlob.url, {
+    // Add timestamp to bypass Vercel Edge CDN cache
+    const response = await fetch(`${couponBlob.url}?t=${Date.now()}`, {
       cache: 'no-store',
       headers: {
         'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
@@ -55,7 +56,8 @@ export async function POST(req: NextRequest) {
     
     let coupons: any[] = [];
     if (couponBlob) {
-      const response = await fetch(couponBlob.url, {
+      // Add timestamp to bypass Vercel Edge CDN cache
+      const response = await fetch(`${couponBlob.url}?t=${Date.now()}`, {
         cache: 'no-store',
         headers: {
           'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
