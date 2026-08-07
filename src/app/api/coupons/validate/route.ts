@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { list } from '@vercel/blob';
 
+export const dynamic = 'force-dynamic';
+
 const BLOB_FILENAME = 'coupons.json';
 
 export async function POST(req: NextRequest) {
@@ -11,14 +13,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Promo code is required' }, { status: 400 });
     }
 
-    const { blobs } = await list({ prefix: BLOB_FILENAME });
-    const couponBlob = blobs.find(b => b.pathname === BLOB_FILENAME);
+    const { blobs } = await list({ prefix: 'coupons' });
+    blobs.sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime());
+    const couponBlob = blobs[0];
 
     if (!couponBlob) {
       return NextResponse.json({ error: 'Invalid or expired promo code' }, { status: 404 });
     }
 
-    // Add timestamp to bypass Vercel Edge CDN cache
+    // Add timestamp to bypass Vercel Edge CDN cache (just in case, though unique URLs shouldn't be cached)
     const response = await fetch(`${couponBlob.url}?t=${Date.now()}`, {
       cache: 'no-store',
       headers: {

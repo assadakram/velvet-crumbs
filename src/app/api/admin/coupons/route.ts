@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { put, list } from '@vercel/blob';
+import { NextResponse, NextRequest } from 'next/server';
+import { put, list, del } from '@vercel/blob';
+
+export const dynamic = 'force-dynamic';
 
 const BLOB_FILENAME = 'coupons.json';
 
@@ -17,8 +19,10 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const { blobs } = await list({ prefix: BLOB_FILENAME });
-    const couponBlob = blobs.find(b => b.pathname === BLOB_FILENAME);
+    // Fetch existing coupons
+    const { blobs } = await list({ prefix: 'coupons' });
+    blobs.sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime());
+    const couponBlob = blobs[0];
 
     if (!couponBlob) {
       return NextResponse.json({ coupons: [] });
@@ -51,8 +55,9 @@ export async function POST(req: NextRequest) {
     const { action, coupon, code } = body;
 
     // Fetch existing coupons
-    const { blobs } = await list({ prefix: BLOB_FILENAME });
-    const couponBlob = blobs.find(b => b.pathname === BLOB_FILENAME);
+    const { blobs } = await list({ prefix: 'coupons' });
+    blobs.sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime());
+    const couponBlob = blobs[0];
     
     let coupons: any[] = [];
     if (couponBlob) {
@@ -80,14 +85,19 @@ export async function POST(req: NextRequest) {
       coupons = coupons.filter((c: any) => c.code.toUpperCase() !== code.toUpperCase());
     }
 
-    // Save back to Blob
-    await put(BLOB_FILENAME, JSON.stringify(coupons), {
+    // Save back to Blob with a random suffix to ensure a unique URL (bypasses CDN completely)
+    await put('coupons.json', JSON.stringify(coupons), {
       access: 'private',
-      addRandomSuffix: false, // Don't append a random suffix
-      allowOverwrite: true, // Required by Vercel to overwrite the existing file
+      addRandomSuffix: true,
       contentType: 'application/json',
       cacheControlMaxAge: 0,
     });
+
+    // Clean up old blobs to save space
+    if (blobs.length > 0) {
+      const urlsToDelete = blobs.map((b) => b.url);
+      await del(urlsToDelete);
+    }
 
     return NextResponse.json({ success: true, coupons });
   } catch (error) {
