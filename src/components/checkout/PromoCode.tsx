@@ -54,31 +54,35 @@ export default function PromoCode({ appliedCoupon, setAppliedCoupon, disabled }:
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm mt-6">
-      <h3 className="text-sm font-bold text-gray-800 uppercase tracking-wide flex items-center gap-2 mb-4">
-        <Tag size={16} className="text-orange-400" />
-        Promo Code
-      </h3>
+    <div className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5">
+      <div className="flex items-center gap-3 border-b border-orange-100 pb-3">
+        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-rose-100 text-[#F48B7D] text-sm font-bold">
+          <Tag size={14} className="text-[#F48B7D]" />
+        </span>
+        <h3 className="font-bold text-base sm:text-lg text-[#F48B7D] uppercase tracking-wider">
+          Promo Code
+        </h3>
+      </div>
 
       {appliedCoupon ? (
-        <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-3">
-          <div className="flex items-center gap-2 text-green-700">
-            <CheckCircle2 size={18} />
-            <span className="font-bold">{appliedCoupon.code}</span>
-            <span className="text-sm opacity-80">
-              ({appliedCoupon.discountType === 'percentage' ? `${appliedCoupon.discountValue}%` : `${appliedCoupon.discountValue}€`} off)
+        <div className="flex items-center justify-between bg-emerald-50 border border-emerald-100 rounded-2xl p-4">
+          <div className="flex items-center gap-3 text-emerald-800">
+            <CheckCircle2 size={20} className="text-emerald-600" />
+            <span className="font-bold text-base">{appliedCoupon.code}</span>
+            <span className="text-sm font-medium bg-white px-2 py-1 rounded-lg border border-emerald-100 opacity-90">
+              ({appliedCoupon.discountType === 'percentage' ? `${appliedCoupon.discountValue}%` : `${appliedCoupon.discountValue} €`} off)
             </span>
           </div>
           <button
             type="button"
             onClick={handleRemove}
-            className="text-sm text-green-700 underline hover:text-green-800 transition"
+            className="text-sm font-bold text-[#F48B7D] underline hover:text-rose-600 transition-colors"
           >
             Remove
           </button>
         </div>
       ) : (
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             placeholder="Enter code"
@@ -93,22 +97,22 @@ export default function PromoCode({ appliedCoupon, setAppliedCoupon, disabled }:
               }
             }}
             disabled={disabled || loading}
-            className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 outline-none uppercase text-sm disabled:opacity-50"
+            className="flex-1 bg-white border border-orange-100 rounded-2xl px-5 py-4 text-sm sm:text-base text-gray-800 uppercase placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/40 focus:border-[#F48B7D] transition-all disabled:opacity-50"
           />
           <button
             type="button"
             onClick={handleApply}
             disabled={disabled || loading || !code.trim()}
-            className="bg-gray-800 text-white font-bold px-4 py-2 rounded-lg hover:bg-gray-900 transition disabled:opacity-50 flex items-center justify-center min-w-[80px]"
+            className="bg-[#F48B7D] text-white font-bold px-8 py-4 rounded-2xl hover:bg-rose-500 shadow-md hover:shadow-lg transition-all disabled:opacity-50 flex items-center justify-center min-w-[120px] h-[58px] sm:h-auto"
           >
-            {loading ? <RefreshCw size={16} className="animate-spin" /> : 'Apply'}
+            {loading ? <RefreshCw size={20} className="animate-spin" /> : 'Apply'}
           </button>
         </div>
       )}
 
       {error && (
-        <div className="flex items-center gap-1 text-red-500 text-xs mt-2">
-          <AlertCircle size={12} />
+        <div className="flex items-center gap-2 text-red-500 text-sm mt-2 font-medium bg-red-50 p-3 rounded-xl border border-red-100">
+          <AlertCircle size={16} className="text-red-500" />
           {error}
         </div>
       )}
