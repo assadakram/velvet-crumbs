@@ -19,8 +19,8 @@ export default function PromoCode({ appliedCoupon, setAppliedCoupon, disabled }:
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleApply = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleApply = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) e.preventDefault();
     if (!code.trim()) return;
 
     setLoading(true);
@@ -70,6 +70,7 @@ export default function PromoCode({ appliedCoupon, setAppliedCoupon, disabled }:
             </span>
           </div>
           <button
+            type="button"
             onClick={handleRemove}
             className="text-sm text-green-700 underline hover:text-green-800 transition"
           >
@@ -77,23 +78,32 @@ export default function PromoCode({ appliedCoupon, setAppliedCoupon, disabled }:
           </button>
         </div>
       ) : (
-        <form onSubmit={handleApply} className="flex gap-2">
+        <div className="flex gap-2">
           <input
             type="text"
             placeholder="Enter code"
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                if (code.trim() && !disabled && !loading) {
+                  handleApply();
+                }
+              }
+            }}
             disabled={disabled || loading}
             className="flex-1 px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-200 outline-none uppercase text-sm disabled:opacity-50"
           />
           <button
-            type="submit"
+            type="button"
+            onClick={handleApply}
             disabled={disabled || loading || !code.trim()}
             className="bg-gray-800 text-white font-bold px-4 py-2 rounded-lg hover:bg-gray-900 transition disabled:opacity-50 flex items-center justify-center min-w-[80px]"
           >
             {loading ? <RefreshCw size={16} className="animate-spin" /> : 'Apply'}
           </button>
-        </form>
+        </div>
       )}
 
       {error && (
