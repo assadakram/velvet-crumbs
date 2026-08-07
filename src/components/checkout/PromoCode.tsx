@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Tag, CheckCircle2, AlertCircle, RefreshCw } from 'lucide-react';
 
-type Coupon = {
+export type Coupon = {
   code: string;
   discountType: 'percentage' | 'fixed';
   discountValue: number;
