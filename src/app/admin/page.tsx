@@ -17,6 +17,12 @@ import {
   Eye,
   EyeOff,
   AlertTriangle,
+  Tag,
+  Trash2,
+  Plus,
+  RefreshCw,
+  Check,
+  X,
 } from 'lucide-react';
 
 interface PreorderSettings {
@@ -27,12 +33,22 @@ interface PreorderSettings {
   pausedMessageFi: string | null;
 }
 
+type Coupon = {
+  code: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  isActive: boolean;
+};
+
+type ActiveTab = 'order-settings' | 'coupons';
+
 export default function AdminPage() {
   const [authenticated, setAuthenticated] = useState(false);
   const [secretInput, setSecretInput] = useState('');
   const [showSecret, setShowSecret] = useState(false);
   const [authError, setAuthError] = useState('');
   const [logoError, setLogoError] = useState(false);
+  const [activeTab, setActiveTab] = useState<ActiveTab>('order-settings');
 
   const [settings, setSettings] = useState<PreorderSettings>({
     isPaused: false,
@@ -44,6 +60,19 @@ export default function AdminPage() {
 
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  // Coupons state
+  const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [couponsLoading, setCouponsLoading] = useState(false);
+  const [couponsError, setCouponsError] = useState('');
+  const [couponSecret, setCouponSecret] = useState('');
+  const [newCoupon, setNewCoupon] = useState<Coupon>({
+    code: '',
+    discountType: 'percentage',
+    discountValue: 0,
+    isActive: true,
+  });
+
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -77,6 +106,8 @@ export default function AdminPage() {
             pausedMessageFi: data.pausedMessageFi ?? '',
           });
           setAuthenticated(true);
+          const saved = sessionStorage.getItem('admin_secret');
+          if (saved) { setCouponSecret(saved); fetchCoupons(saved); }
         }
       })
       .catch((err) => {
@@ -128,6 +159,10 @@ export default function AdminPage() {
           pausedMessageFi: data.pausedMessageFi ?? '',
         });
         setAuthenticated(true);
+        // Save for coupon Bearer auth
+        sessionStorage.setItem('admin_secret', secretInput);
+        setCouponSecret(secretInput);
+        fetchCoupons(secretInput);
       } else {
         setAuthError('Authentication succeeded but failed to load settings.');
       }
@@ -148,6 +183,74 @@ export default function AdminPage() {
     }
     setAuthenticated(false);
     setSecretInput('');
+    sessionStorage.removeItem('admin_secret');
+    setCouponSecret('');
+    setCoupons([]);
+  };
+
+  // ── Coupon Handlers ──────────────────────────────────────────────────────────
+  const fetchCoupons = async (authSecret: string) => {
+    setCouponsLoading(true);
+    setCouponsError('');
+    try {
+      const res = await fetch('/api/admin/coupons', { headers: { Authorization: `Bearer ${authSecret}` } });
+      if (res.status === 401) { setCouponsError('Invalid admin secret for coupon API.'); return; }
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setCoupons(data.coupons || []);
+    } catch (err: any) { setCouponsError(err.message || 'Failed to fetch coupons'); }
+    finally { setCouponsLoading(false); }
+  };
+
+  const handleCreateCoupon = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newCoupon.code || newCoupon.discountValue <= 0) { setCouponsError('Please provide a valid code and discount value'); return; }
+    setCouponsLoading(true);
+    try {
+      const res = await fetch('/api/admin/coupons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${couponSecret}` },
+        body: JSON.stringify({ action: 'create', coupon: newCoupon }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setCoupons(data.coupons);
+      setNewCoupon({ code: '', discountType: 'percentage', discountValue: 0, isActive: true });
+      showToast('Coupon created!', 'success');
+    } catch (err: any) { setCouponsError(err.message || 'Failed to create coupon'); }
+    finally { setCouponsLoading(false); }
+  };
+
+  const handleToggleCoupon = async (coupon: Coupon) => {
+    setCouponsLoading(true);
+    try {
+      const res = await fetch('/api/admin/coupons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${couponSecret}` },
+        body: JSON.stringify({ action: 'update', coupon: { ...coupon, isActive: !coupon.isActive } }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setCoupons(data.coupons);
+    } catch (err: any) { setCouponsError(err.message || 'Failed to update coupon'); }
+    finally { setCouponsLoading(false); }
+  };
+
+  const handleDeleteCoupon = async (code: string) => {
+    if (!confirm(`Delete coupon ${code}?`)) return;
+    setCouponsLoading(true);
+    try {
+      const res = await fetch('/api/admin/coupons', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${couponSecret}` },
+        body: JSON.stringify({ action: 'delete', code }),
+      });
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      setCoupons(data.coupons);
+      showToast('Coupon deleted.', 'success');
+    } catch (err: any) { setCouponsError(err.message || 'Failed to delete coupon'); }
+    finally { setCouponsLoading(false); }
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -334,10 +437,42 @@ export default function AdminPage() {
             </button>
           </div>
         </div>
+
+        {/* Tab Navigation */}
+        <div className="max-w-4xl mx-auto px-4 flex gap-1">
+          <button
+            id="tab-order-settings"
+            onClick={() => setActiveTab('order-settings')}
+            className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 ${
+              activeTab === 'order-settings'
+                ? 'border-[#F48B7D] text-[#F48B7D]'
+                : 'border-transparent text-gray-400 hover:text-gray-600'
+            }`}
+          >
+            <ToggleLeft className="h-4 w-4" />
+            Order Settings
+          </button>
+          <button
+            id="tab-coupons"
+            onClick={() => { setActiveTab('coupons'); if (couponSecret) fetchCoupons(couponSecret); }}
+            className={`flex items-center gap-2 px-5 py-3 text-sm font-bold border-b-2 transition-all duration-200 ${
+              activeTab === 'coupons'
+                ? 'border-[#F48B7D] text-[#F48B7D]'
+                : 'border-transparent text-gray-400 hover:text-gray-600'
+            }`}
+          >
+            <Tag className="h-4 w-4" />
+            Coupons
+          </button>
+        </div>
       </header>
 
       {/* Main */}
       <main className="max-w-4xl mx-auto px-4 py-10 space-y-6">
+
+        {/* ── ORDER SETTINGS TAB ── */}
+        {activeTab === 'order-settings' && (
+        <>
         <div className="text-center space-y-2 mb-10">
           <span className="text-[#F48B7D] text-xs font-bold uppercase tracking-widest block">Pre-Order Control</span>
           <h1 className="text-3xl sm:text-4xl font-extrabold font-serif text-[#2D2D2D]">Order Settings</h1>
@@ -556,6 +691,106 @@ export default function AdminPage() {
 
           </form>
         )}
+        </>
+        )}
+
+        {/* ── COUPONS TAB ── */}
+        {activeTab === 'coupons' && (
+          <>
+            <div className="text-center space-y-2 mb-10">
+              <span className="text-[#F48B7D] text-xs font-bold uppercase tracking-widest block">Discount Management</span>
+              <h1 className="text-3xl sm:text-4xl font-extrabold font-serif text-[#2D2D2D]">Coupons</h1>
+              <p className="text-sm text-gray-400 max-w-md mx-auto">Create, activate, or delete discount coupons for your customers.</p>
+            </div>
+
+            {couponsError && (
+              <div className="bg-red-50 border-l-4 border-red-400 p-4 rounded-2xl flex items-start gap-2">
+                <XCircle className="h-4 w-4 text-red-500 shrink-0 mt-0.5" />
+                <p className="text-red-700 text-sm">{couponsError}</p>
+              </div>
+            )}
+
+            {/* Create Coupon Card */}
+            <div className="bg-white rounded-3xl border border-orange-100 shadow-sm p-6">
+              <div className="flex items-start gap-4 border-b border-gray-50 pb-5 mb-6">
+                <div className="h-11 w-11 rounded-2xl bg-emerald-50 flex items-center justify-center shrink-0"><Plus className="h-5 w-5 text-emerald-500" /></div>
+                <div>
+                  <h2 className="font-bold text-[#2D2D2D] text-base">Create New Coupon</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">Add a new discount code for customers to use at checkout.</p>
+                </div>
+              </div>
+              <form onSubmit={handleCreateCoupon} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Code</label>
+                  <input type="text" placeholder="e.g. WINTER10" value={newCoupon.code} onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value.toUpperCase().replace(/\s/g, '') })} className="w-full bg-[#FFF9F5] border border-orange-100 rounded-2xl px-4 py-3 text-sm text-[#2D2D2D] uppercase placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/40 focus:border-[#F48B7D] transition-all" required />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Type</label>
+                  <select value={newCoupon.discountType} onChange={(e) => setNewCoupon({ ...newCoupon, discountType: e.target.value as 'percentage' | 'fixed' })} className="w-full bg-[#FFF9F5] border border-orange-100 rounded-2xl px-4 py-3 text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/40 focus:border-[#F48B7D] transition-all">
+                    <option value="percentage">Percentage (%)</option>
+                    <option value="fixed">Fixed (euro)</option>
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Value</label>
+                  <input type="number" min="0.1" step="0.1" placeholder="10" value={newCoupon.discountValue || ''} onChange={(e) => setNewCoupon({ ...newCoupon, discountValue: parseFloat(e.target.value) })} className="w-full bg-[#FFF9F5] border border-orange-100 rounded-2xl px-4 py-3 text-sm text-[#2D2D2D] focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/40 focus:border-[#F48B7D] transition-all" required />
+                </div>
+                <button type="submit" disabled={couponsLoading} className="flex items-center justify-center gap-2 bg-gradient-to-r from-rose-400 to-[#F48B7D] text-white font-bold px-6 py-3 rounded-2xl shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-200 disabled:opacity-60 h-[48px]">
+                  {couponsLoading ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Add Coupon'}
+                </button>
+              </form>
+            </div>
+
+            {/* Coupons List */}
+            <div className="bg-white rounded-3xl border border-orange-100 shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-50 flex items-center justify-between">
+                <h2 className="font-bold text-[#2D2D2D] text-base flex items-center gap-2">
+                  <Tag className="h-4 w-4 text-[#F48B7D]" /> All Coupons
+                  <span className="ml-1 text-xs font-bold text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">{coupons.length}</span>
+                </h2>
+                <button onClick={() => couponSecret && fetchCoupons(couponSecret)} disabled={couponsLoading} className="text-xs text-gray-400 hover:text-[#F48B7D] transition-colors flex items-center gap-1">
+                  <RefreshCw className={`h-3.5 w-3.5 ${couponsLoading ? 'animate-spin' : ''}`} /> Refresh
+                </button>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-100 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                      <th className="px-6 py-3">Code</th>
+                      <th className="px-6 py-3">Discount</th>
+                      <th className="px-6 py-3 text-center">Status</th>
+                      <th className="px-6 py-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {coupons.length === 0 ? (
+                      <tr><td colSpan={4} className="px-6 py-12 text-center text-gray-400 text-sm">No coupons yet. Create one above!</td></tr>
+                    ) : (
+                      coupons.map((coupon) => (
+                        <tr key={coupon.code} className="hover:bg-[#FFF9F5] transition-colors">
+                          <td className="px-6 py-4 font-bold text-[#2D2D2D] font-mono text-sm">{coupon.code}</td>
+                          <td className="px-6 py-4 text-gray-600 text-sm">{coupon.discountType === 'percentage' ? `${coupon.discountValue}% off` : `${coupon.discountValue} euro off`}</td>
+                          <td className="px-6 py-4 text-center">
+                            <button onClick={() => handleToggleCoupon(coupon)} disabled={couponsLoading} className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${coupon.isActive ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-100' : 'bg-gray-100 text-gray-500 hover:bg-gray-200 border border-gray-200'}`}>
+                              {coupon.isActive ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
+                              {coupon.isActive ? 'Active' : 'Inactive'}
+                            </button>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            <button onClick={() => handleDeleteCoupon(coupon.code)} disabled={couponsLoading} className="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                              <Trash2 className="h-4 w-4" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </>
+        )}
+
       </main>
 
       {/* Toast */}
