@@ -122,6 +122,11 @@ export default function ProductMenu({ lang, t }: ProductMenuProps) {
                           {lang === 'en' ? 'around 140g' : 'n. 140g'}
                         </span>
                       )}
+                      {activeTab === 'brownies' && (
+                        <span className="text-[10px] sm:text-xs text-gray-400 font-semibold block">
+                          {lang === 'en' ? 'Size: Large' : 'Koko: Iso'}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <p className="text-sm text-gray-600 leading-relaxed">
@@ -154,7 +159,7 @@ export default function ProductMenu({ lang, t }: ProductMenuProps) {
                     ) : (
                       <>
                         <span className="text-xl font-bold text-[#F48B7D]">
-                          {item.price.toFixed(2).replace('.', ',')} €
+                          {item.price.toFixed(2).replace('.', ',')} €{activeTab === 'brownies' ? (lang === 'en' ? ' / piece' : ' / kpl') : ''}
                         </span>
                         {item.origPrice > item.price && (
                           <span className="text-xs text-gray-400 line-through">

@@ -2,42 +2,42 @@ export const BROWNIES = [
   {
     id: 'brownie-choco-hazelnut',
     img: '/images/choco_hazelnut_brownie.png',
-    price: 4.50,
+    price: 3.99,
     origPrice: 4.50,
     special: false,
     vegan: true,
     color: 'from-amber-700 to-amber-900',
     name: { en: 'Choco Hazelnut Brownie', fi: 'Hasselpähkinä-Suklaa Brownie' },
     desc: {
-      en: 'A rich, melt-in-your-mouth chocolate brownie topped with roasted hazelnuts and a soft Nutella-inspired hazelnut spread. Baked with premium ingredients for the ultimate gooey texture.',
-      fi: 'Täyteläinen ja suussa sulava suklaabrownie, jonka päällä on paahdettuja hasselpähkinöitä ja pehmeää Nutella-tyylistä hasselpähkinälevitettä. Leivottu laadukkaista raaka-aineista täydellisen mehevän rakenteen saavuttamiseksi.'
+      en: 'A fudgy vegan dark chocolate base topped with creamy hazelnut spread and crunchy walnuts. Made with top-shelf ingredients for a lush, melt-in-your-mouth experience.',
+      fi: 'Täyteläinen vegaaninen tummasuklaapohja, jonka kruunaa samettinen hasselpähkinälevite ja rapea saksanpähkinä. Valmistettu ensiluokkaisista raaka-aineista suussa sulavaksi elämykseksi.'
     },
     ingredients: {
-      en: ['Cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Hazelnut spread', 'Roasted hazelnuts', 'Chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt'],
-      fi: ['Ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Hasselpähkinälevite', 'Paahdettu hasselpähkinä', 'Suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola']
+      en: ['Cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Vegan hazelnut spread', 'Roasted hazelnuts', 'Chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt'],
+      fi: ['Ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Vegaaninen hasselpähkinälevite', 'Paahdettu hasselpähkinä', 'Suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola']
     }
   },
   {
     id: 'brownie-pistachio',
     img: '/images/Pistachio_fudge_brownie.png',
-    price: 4.50,
+    price: 3.99,
     origPrice: 4.50,
     special: false,
     color: 'from-green-600 to-green-800',
     name: { en: 'Pistachio Fudge Brownie', fi: 'Pistaasi-Fudge Brownie' },
     desc: {
-      en: 'A decadent brownie base crowned with premium, smooth pistachio cream and sprinkled with crushed pistachios. Plant-based luxury in every bite.',
-      fi: 'Ylellinen brownie-pohja, joka on kruunattu ensiluokkaisella, pehmeällä pistaasikermalla ja ripoteltu murskatuilla pistaaseilla. Kasvipohjaista luksusta jokaisella suupalalla.'
+      en: 'Our signature rich dark chocolate brownie crowned with a smooth pistachio spread and topped with crunchy salted pistachios. Crafted from high-quality ingredients to melt effortlessly on your tongue. (Contains dairy)',
+      fi: 'Täyteläinen tummasuklaabrownie, jossa on ylellistä pistaasilevitettä ja päällä rapeita suolattuja pistaasipähkinöitä. Valmistettu korkealaatuisista raaka-aineista sulamaan pehmeästi kielellä. (Sisältää maitoa)'
     },
     ingredients: {
-      en: ['Vegan cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Pistachio spread', 'Crushed pistachios', 'Vegan chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt', 'Milk'],
-      fi: ['Vegaaninen ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Pistaasilevite', 'Murskattu pistaasi', 'Vegaaninen suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola', 'Maito']
+      en: ['Cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Pistachio spread', 'Crushed pistachios', 'Vegan chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt', 'Milk'],
+      fi: ['Ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Pistaasilevite', 'Murskattu pistaasi', 'Vegaaninen suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola', 'Maito']
     }
   },
   {
     id: 'brownie-biscoff',
     img: '/images/Biscoff_melt_brownie.png',
-    price: 4.50,
+    price: 3.99,
     origPrice: 4.50,
     special: false,
     vegan: true,
@@ -48,14 +48,14 @@ export const BROWNIES = [
       fi: 'Mehevä tummasuklaabrownie, jonka päällä on reilu kerros sulatettua Lotus Biscoff -levitettä ja rouskuva Biscoff-keksi. 100 % vegaaninen herkku laadukkaista raaka-aineista.'
     },
     ingredients: {
-      en: ['Vegan cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Biscoff spread', 'Biscoff biscuit', 'Vegan chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt'],
-      fi: ['Vegaaninen ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Biscoff-levite', 'Biscoff-keksi', 'Vegaaninen suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola']
+      en: ['Cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Biscoff spread', 'Biscoff biscuit', 'Vegan chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt'],
+      fi: ['Ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Biscoff-levite', 'Biscoff-keksi', 'Vegaaninen suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola']
     }
   },
   {
     id: 'brownie-coconut',
     img: '/images/Coconut_crush_brownie.png',
-    price: 4.50,
+    price: 3.99,
     origPrice: 4.50,
     special: false,
     vegan: true,
@@ -66,14 +66,14 @@ export const BROWNIES = [
       fi: 'Samettista vegaanista valkosuklaalevitettä ja kookoshiutaleita mehukkaan tummasuklaapohjan päällä. Valmistettu laadukkaista kasvipohjaisista aineksista pehmeän unelmalliseksi suupalaksi.'
     },
     ingredients: {
-      en: ['Vegan cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Vegan white chocolate spread', 'Coconut flakes', 'Vegan chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt'],
-      fi: ['Vegaaninen ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Vegaaninen valkosuklaalevite', 'Kookoshiutale', 'Vegaaninen suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola']
+      en: ['Cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Vegan white chocolate spread', 'Coconut flakes', 'Vegan chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt'],
+      fi: ['Ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Vegaaninen valkosuklaalevite', 'Kookoshiutale', 'Vegaaninen suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola']
     }
   },
   {
     id: 'brownie-oreo',
     img: '/images/Oreo_crunch_brownie.png',
-    price: 4.50,
+    price: 3.99,
     origPrice: 4.50,
     special: false,
     vegan: true,
@@ -84,14 +84,14 @@ export const BROWNIES = [
       fi: 'Erittäin täyteläinen kasvipohjainen brownie, jossa yhdistyvät kermainen vegaaninen valkosuklaalevite ja rapea Oreo-keksimurska. Ensiluokkaiset raaka-aineet kohtaavat klassisen keksi-kermakombinaation.'
     },
     ingredients: {
-      en: ['Vegan cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Vegan white chocolate spread', 'Oreo cookies', 'Vegan chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt'],
-      fi: ['Vegaaninen ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Vegaaninen valkosuklaalevite', 'Oreo-keksi (murskattu)', 'Vegaaninen suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola']
+      en: ['Cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Vegan white chocolate spread', 'Oreo cookies', 'Vegan chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt'],
+      fi: ['Ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Vegaaninen valkosuklaalevite', 'Oreo-keksi (murskattu)', 'Vegaaninen suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola']
     }
   },
   {
     id: 'brownie-raspberry',
     img: '/images/raspberry_delight_brownie.png',
-    price: 4.50,
+    price: 3.99,
     origPrice: 4.50,
     special: false,
     vegan: true,
@@ -102,8 +102,8 @@ export const BROWNIES = [
       fi: 'Täyteläinen vegaaninen tummasuklaa kohtaa pehmeän vegaanisen valkosuklaalevitteen ja raikkaan pakastekuivatun vadelman. Valmistettu laadukkaista aineksista raikkaan ja suussa sulavan maun luomiseksi.'
     },
     ingredients: {
-      en: ['Vegan cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Vegan white chocolate spread', 'Freeze-dried raspberries', 'Vegan chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt', 'Food coloring'],
-      fi: ['Vegaaninen ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Vegaaninen valkosuklaalevite', 'Pakastekuivattu vadelma', 'Vegaaninen suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola', 'Elintarvikeväri']
+      en: ['Cane sugar', 'Wheat flour', 'Vegetable oil', 'Water', 'Dark cocoa powder', 'Vegan white chocolate spread', 'Freeze-dried raspberries', 'Vegan chocolate chips', 'Powdered sugar', 'Ground flaxseed', 'Vanilla extract', 'Salt', 'Food coloring'],
+      fi: ['Ruokosokeri', 'Vehnäjauho', 'Kasviöljy', 'Vesi', 'Tumma kaakaojauho', 'Vegaaninen valkosuklaalevite', 'Pakastekuivattu vadelma', 'Vegaaninen suklaahippu', 'Tomusokeri', 'Hienonnettu pellavansiemen', 'Vanilja-uute', 'Suola', 'Elintarvikeväri']
     }
   }
 ];
@@ -113,7 +113,7 @@ export const BOXES = [
     id: 'box-ultimate-brownie',
     img: '/images/Ultimate_Brownie_Box.png',
     price: 19.90,
-    origPrice: 27.00,
+    origPrice:  23.00,
     special: false,
     color: 'from-orange-500 to-red-600',
     name: { en: 'Ultimate Brownie Box', fi: 'Ultimate Brownie -Lajitelmaboksi' },
