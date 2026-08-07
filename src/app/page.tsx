@@ -18,6 +18,7 @@ import DateTimeSelection from '../components/checkout/DateTimeSelection';
 import DeliveryMethod from '../components/checkout/DeliveryMethod';
 import CheckoutCTA from '../components/checkout/CheckoutCTA';
 import OrderSuccessModal from '../components/checkout/OrderSuccessModal';
+import PromoCode, { Coupon } from '../components/checkout/PromoCode';
 
 import { COOKIES } from '../constants/cookies';
 import { BROWNIES, BOXES } from '../constants/brownies';
@@ -50,6 +51,7 @@ export default function App() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | null }>({ message: '', type: null });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [whatsappUrl, setWhatsappUrl] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
@@ -87,35 +89,45 @@ export default function App() {
     }
   }, []);
 
-  const { totalCookiesCount, cookiesCost, isFreeDelivery, deliveryFee, finalTotal, funfettiBonusCount } = useMemo(() => {
+  const { totalCookiesCount, isFreeDelivery, finalTotal, funfettiBonusCount, discountAmount } = useMemo(() => {
     let count = 0;
     let cost = 0;
-    
     Object.keys(cart).forEach(id => {
       const q = cart[id];
-      const productObj = ALL_PRODUCTS.find(c => c.id === id);
+      const cookieObj = ALL_PRODUCTS.find(c => c.id === id);
       count += q;
-      cost += q * (productObj ? productObj.price : 0);
+      cost += q * (cookieObj ? cookieObj.price : 0);
     });
 
-    const freeDeliveryQualified = cost >= 25;
+    // Apply discount if there is an applied coupon
+    let discount = 0;
+    if (appliedCoupon) {
+      if (appliedCoupon.discountType === 'percentage') {
+        discount = cost * (appliedCoupon.discountValue / 100);
+      } else if (appliedCoupon.discountType === 'fixed') {
+        discount = appliedCoupon.discountValue;
+      }
+      // Ensure discount doesn't exceed cost
+      if (discount > cost) discount = cost;
+    }
+
+    const freeDeliveryQualified = count >= 6;
     let delFee = 0;
     
     if (form.deliveryMethod === 'delivery') {
       delFee = freeDeliveryQualified ? 0 : 5.00;
     }
-
+    
     const funfettiCount = Math.floor(count / 8);
-
     return {
       totalCookiesCount: count,
-      cookiesCost: cost,
       isFreeDelivery: freeDeliveryQualified,
       deliveryFee: delFee,
-      finalTotal: cost + delFee,
+      discountAmount: discount,
+      finalTotal: (cost - discount) + delFee,
       funfettiBonusCount: funfettiCount
     };
-  }, [cart, form.deliveryMethod]);
+  }, [cart, form.deliveryMethod, appliedCoupon]);
 
   const updateQuantity = (id: string, change: number) => {
     setCart(prev => {
@@ -206,6 +218,7 @@ export default function App() {
       `*${lang === 'en' ? 'Delivery' : 'Toimitustapa'}:* ${deliveryMethodLabel}\n\n` +
       `*${lang === 'en' ? 'Box Selection' : 'Laatikon sisältö'}:*\n${cookieLines}\n` +
       (form.specialRequests ? `*${lang === 'en' ? 'Special wishes' : 'Toiveet'}:* ${form.specialRequests}\n\n` : '') +
+      (appliedCoupon ? `*${lang === 'en' ? 'Promo Code' : 'Alennuskoodi'} (${appliedCoupon.code}):* -${discountAmount.toFixed(2).replace('.', ',')} €\n` : '') +
       `*${lang === 'en' ? 'Estimated Total' : 'Arvioitu summa'}:* ${finalTotal.toFixed(2).replace('.', ',')} €\n\n` +
       `${bottomGreet}`;
 
@@ -402,10 +415,18 @@ export default function App() {
                 setForm={setForm}
               />
 
+              {/* Promo Code section */}
+              <PromoCode 
+                appliedCoupon={appliedCoupon} 
+                setAppliedCoupon={setAppliedCoupon} 
+                disabled={isRedirecting || totalCookiesCount === 0} 
+              />
+
               {/* Checkout CTA block */}
               <CheckoutCTA
                 t={t}
                 finalTotal={finalTotal}
+                discountAmount={discountAmount}
                 paymentAcknowledge={paymentAcknowledge}
                 setPaymentAcknowledge={setPaymentAcknowledge}
                 validationError={validationError}
