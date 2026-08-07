@@ -19,6 +19,7 @@ export async function POST(req: NextRequest) {
     }
 
     const response = await fetch(couponBlob.url, {
+      cache: 'no-store',
       headers: {
         'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
       },

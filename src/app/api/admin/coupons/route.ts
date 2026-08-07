@@ -25,12 +25,15 @@ export async function GET(req: NextRequest) {
     }
 
     const response = await fetch(couponBlob.url, {
+      cache: 'no-store',
       headers: {
         'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
       },
     });
     const coupons = await response.json();
-    return NextResponse.json({ coupons });
+    return NextResponse.json({ coupons }, {
+      headers: { 'Cache-Control': 'no-store, max-age=0' },
+    });
   } catch (error) {
     console.error('Error fetching coupons:', error);
     return NextResponse.json({ error: 'Failed to fetch coupons' }, { status: 500 });
@@ -53,6 +56,7 @@ export async function POST(req: NextRequest) {
     let coupons: any[] = [];
     if (couponBlob) {
       const response = await fetch(couponBlob.url, {
+        cache: 'no-store',
         headers: {
           'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
         },
@@ -77,7 +81,10 @@ export async function POST(req: NextRequest) {
     // Save back to Blob
     await put(BLOB_FILENAME, JSON.stringify(coupons), {
       access: 'private',
-      addRandomSuffix: false, // Override the file
+      addRandomSuffix: false, // Don't append a random suffix
+      allowOverwrite: true, // Required by Vercel to overwrite the existing file
+      contentType: 'application/json',
+      cacheControlMaxAge: 0,
     });
 
     return NextResponse.json({ success: true, coupons });
