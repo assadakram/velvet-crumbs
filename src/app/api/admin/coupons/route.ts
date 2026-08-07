@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 const BLOB_FILENAME = 'coupons.json';
 
-// Helper to check admin authorization
+// Helper to check admin authoriezation
 function isAuthorized(req: NextRequest) {
   const authHeader = req.headers.get('Authorization');
   const secret = process.env.ADMIN_SECRET;
