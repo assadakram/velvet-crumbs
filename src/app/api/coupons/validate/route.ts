@@ -18,7 +18,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid or expired promo code' }, { status: 404 });
     }
 
-    const response = await fetch(couponBlob.url);
+    const response = await fetch(couponBlob.url, {
+      headers: {
+        'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+      },
+    });
     const coupons = await response.json();
 
     const coupon = coupons.find((c: any) => c.code.toUpperCase() === code.toUpperCase());

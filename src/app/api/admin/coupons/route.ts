@@ -24,7 +24,11 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ coupons: [] });
     }
 
-    const response = await fetch(couponBlob.url);
+    const response = await fetch(couponBlob.url, {
+      headers: {
+        'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+      },
+    });
     const coupons = await response.json();
     return NextResponse.json({ coupons });
   } catch (error) {
@@ -48,7 +52,11 @@ export async function POST(req: NextRequest) {
     
     let coupons: any[] = [];
     if (couponBlob) {
-      const response = await fetch(couponBlob.url);
+      const response = await fetch(couponBlob.url, {
+        headers: {
+          'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+        },
+      });
       coupons = await response.json();
     }
 
@@ -68,7 +76,7 @@ export async function POST(req: NextRequest) {
 
     // Save back to Blob
     await put(BLOB_FILENAME, JSON.stringify(coupons), {
-      access: 'public',
+      access: 'private',
       addRandomSuffix: false, // Override the file
     });
 
