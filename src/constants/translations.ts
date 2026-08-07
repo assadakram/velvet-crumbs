@@ -69,7 +69,8 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
     payTitle: "Payment & Confirmation Policy",
     payDesc: "No payment is collected during checkout. Once we receive your request, we will contact you privately (via WhatsApp or Email) to confirm availability and share payment details (MobilePay or Bank Transfer). In most cases, orders are confirmed once a payment screenshot is shared. Cash on pickup/delivery is accepted in select cases.",
     payAck: "I understand that my order is baked fresh and only confirmed once payment is made in advance (MobilePay/Bank Transfer) and a screenshot of the payment is shared.",
-    alertPayAck: "⚠️ Please confirm that you understand the payment policy by checking the acknowledgment box."
+    alertPayAck: "⚠️ Please confirm that you understand the payment policy by checking the acknowledgment box.",
+    ordersPaused: "Pre-Orders Paused"
   },
   fi: {
     allergenWarn: "Allergeenit: Suurin osa tuotteistamme sisältää vehnää, kananmunia, pähkinöitä ja maitotuotteita. Laktoosittomat vaihtoehdot tilattavissa — kirjoita toiveesi lisätietokenttään.",
@@ -141,6 +142,7 @@ export const TRANSLATIONS: Record<string, Record<string, string>> = {
     payTitle: "Maksutiedot & Vahvistuskäytäntö",
     payDesc: "Sivustolla ei vastaanoteta maksuja. Saatuamme pyyntösi otamme sinuun yhteyttä (WhatsApp tai sähköposti) vahvistaaksemme saatavuuden ja lähetämme maksutiedot (MobilePay tai tilisiirto). Tilaus vahvistetaan, kun lähetät meille maksukuitin/-kuvakaappauksen. Käteinen noudettaessa/toimitettaessa sopimuksen mukaan.",
     payAck: "Ymmärrän, että tilaukseni leivotaan tuoreena ja vahvistetaan vasta, kun ennakkomaksu (MobilePay/tilisiirto) on suoritettu ja maksukuitti/-kuvakaappaus on jaettu.",
-    alertPayAck: "⚠️ Vahvistathan lukeneesi maksuehdot valitsemalla vahvistusruudun."
+    alertPayAck: "⚠️ Vahvistathan lukeneesi maksuehdot valitsemalla vahvistusruudun.",
+    ordersPaused: "Tilaukset ovat tauolla"
   }
 };

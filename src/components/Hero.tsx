@@ -47,7 +47,7 @@ export default function Hero({ lang, t }: HeroProps) {
 
           <div className="flex flex-wrap gap-4 pt-2">
             <a 
-              href="#order" 
+              href={`/order?lang=${lang}`} 
               className="cursor-pointer bg-[#F48B7D] text-white px-8 py-4 rounded-full font-bold shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200 text-sm sm:text-base"
             >
               {t('btnBuild')}

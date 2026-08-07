@@ -8,6 +8,7 @@ interface CheckoutCTAProps {
   validationError: string;
   isRedirecting: boolean;
   handleOrderSubmit: (e: React.FormEvent) => void;
+  isCurrentlyPaused?: boolean;
 }
 
 export default function CheckoutCTA({
@@ -18,6 +19,7 @@ export default function CheckoutCTA({
   validationError,
   isRedirecting,
   handleOrderSubmit,
+  isCurrentlyPaused = false,
 }: CheckoutCTAProps) {
   return (
     <div id="checkout-cta-section" className="bg-[#F48B7D] text-white p-6 sm:p-8 rounded-3xl text-center space-y-4 shadow-lg">
@@ -76,11 +78,15 @@ export default function CheckoutCTA({
       <button 
         type="submit" 
         onClick={handleOrderSubmit}
-        disabled={isRedirecting}
-        className="cursor-pointer w-full max-w-md mx-auto bg-white text-[#F48B7D] hover:bg-rose-50 px-6 py-4 rounded-xl font-bold text-base sm:text-lg shadow-md active:scale-95 duration-200 transition-all flex items-center justify-center gap-2"
+        disabled={isRedirecting || isCurrentlyPaused}
+        className={`w-full max-w-md mx-auto px-6 py-4 rounded-xl font-bold text-base sm:text-lg shadow-md duration-200 transition-all flex items-center justify-center gap-2 ${
+          isCurrentlyPaused 
+            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            : 'bg-white text-[#F48B7D] hover:bg-rose-50 cursor-pointer active:scale-95'
+        }`}
       >
-        <span>📲</span>
-        <span>{t('btnSendWA')}</span>
+        <span>{isCurrentlyPaused ? '🔒' : '📲'}</span>
+        <span>{isCurrentlyPaused ? t('ordersPaused') : t('btnSendWA')}</span>
       </button>
 
       <p className="text-xs opacity-75 italic">
