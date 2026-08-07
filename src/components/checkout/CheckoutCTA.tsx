@@ -8,6 +8,8 @@ interface CheckoutCTAProps {
   validationError: string;
   isRedirecting: boolean;
   handleOrderSubmit: (e: React.FormEvent) => void;
+  isCurrentlyPaused?: boolean;
+  discountAmount?: number;
 }
 
 export default function CheckoutCTA({
@@ -18,6 +20,8 @@ export default function CheckoutCTA({
   validationError,
   isRedirecting,
   handleOrderSubmit,
+  isCurrentlyPaused = false,
+  discountAmount = 0,
 }: CheckoutCTAProps) {
   return (
     <div id="checkout-cta-section" className="bg-[#F48B7D] text-white p-6 sm:p-8 rounded-3xl text-center space-y-4 shadow-lg">
@@ -28,6 +32,11 @@ export default function CheckoutCTA({
         <div className="text-4xl sm:text-5xl font-extrabold font-serif">
           {finalTotal.toFixed(2).replace('.', ',')} €
         </div>
+        {discountAmount > 0 && (
+          <p className="text-sm font-bold text-green-200 mt-2">
+            Discount applied: -{discountAmount.toFixed(2).replace('.', ',')} €
+          </p>
+        )}
         <p className="text-xs opacity-75">
           {t('waWarning')}
         </p>
