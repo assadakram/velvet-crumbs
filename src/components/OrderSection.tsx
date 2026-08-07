@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Clock } from 'lucide-react';
 
-import CookieSelection from './checkout/CookieSelection';
+import CookieSelection from './checkout/ProductSelection';
 import SpecialRequests from './checkout/SpecialRequests';
 import ContactDetails from './checkout/ContactDetails';
 import DateTimeSelection from './checkout/DateTimeSelection';
@@ -409,7 +409,6 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
                   t={t}
                   cart={cart}
                   updateQuantity={updateQuantity}
-                  totalCookiesCount={totalCookiesCount}
                   funfettiBonusCount={funfettiBonusCount}
                 />
 
