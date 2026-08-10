@@ -56,9 +56,6 @@ export default function ProductMenu({ lang, t }: ProductMenuProps) {
           <h2 className="text-3xl sm:text-4xl font-extrabold font-serif text-[#2D2D2D]">
             {t('menuTitle')}
           </h2>
-          <div className="inline-block bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold px-6 py-2.5 rounded-full shadow-sm mt-4">
-            {t('menuPromo')}
-          </div>
         </div>
 
         {/* Category Tabs */}
@@ -124,7 +121,22 @@ export default function ProductMenu({ lang, t }: ProductMenuProps) {
                       )}
                       {activeTab === 'brownies' && (
                         <span className="text-[10px] sm:text-xs text-gray-400 font-semibold block">
-                          {lang === 'en' ? 'Size: Large' : 'Koko: Iso'}
+                          {lang === 'en' ? 'Size: L' : 'Koko: L'}
+                        </span>
+                      )}
+                      {activeTab === 'boxes' && item.id === 'box-ultimate-brownie' && (
+                        <span className="text-[10px] sm:text-xs text-gray-400 font-semibold block">
+                          {lang === 'en' ? 'Size: M' : 'Koko: M'}
+                        </span>
+                      )}
+                      {activeTab === 'boxes' && item.id.includes('mini') && (
+                        <span className="text-[10px] sm:text-xs text-gray-400 font-semibold block">
+                          {lang === 'en' ? 'Size: S' : 'Koko: S'}
+                        </span>
+                      )}
+                      {activeTab === 'boxes' && item.id === 'box-mix-match' && (
+                        <span className="text-[10px] sm:text-xs text-gray-400 font-semibold block">
+                          {lang === 'en' ? 'Size: L' : 'Koko: L'}
                         </span>
                       )}
                     </div>
