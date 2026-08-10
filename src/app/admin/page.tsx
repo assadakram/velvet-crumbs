@@ -722,7 +722,7 @@ export default function AdminPage() {
               <form onSubmit={handleCreateCoupon} className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Code</label>
-                  <input type="text" placeholder="e.g. WINTER10" value={newCoupon.code} onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value.replace(/\s/g, '') })} className="w-full bg-[#FFF9F5] border border-orange-100 rounded-2xl px-4 py-3 text-sm text-[#2D2D2D] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/40 focus:border-[#F48B7D] transition-all" required />
+                  <input type="text" placeholder="e.g. WINTER10" value={newCoupon.code} onChange={(e) => setNewCoupon({ ...newCoupon, code: e.target.value.replace(/\s/g, '').toUpperCase() })} className="w-full bg-[#FFF9F5] border border-orange-100 rounded-2xl px-4 py-3 text-sm text-[#2D2D2D] placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-[#F48B7D]/40 focus:border-[#F48B7D] transition-all uppercase font-mono tracking-widest" required />
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Type</label>
@@ -764,7 +764,7 @@ export default function AdminPage() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {coupons.length === 0 ? (
-                      <tr><td colSpan={4} className="px-6 py-12 text-center text-gray-400 text-sm">No coupons yet. Create one above!</td></tr>
+                      <tr><td colSpan={4} className="px-6 py-12 text-center text-gray-400 text-sm">No coupons yet. Create one above ..!</td></tr>
                     ) : (
                       coupons.map((coupon) => (
                         <tr key={coupon.code} className="hover:bg-[#FFF9F5] transition-colors">
