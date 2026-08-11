@@ -6,6 +6,7 @@ interface DeliveryMethodProps {
   isFreeDelivery: boolean;
   deliveryMethod: string;
   setForm: React.Dispatch<React.SetStateAction<any>>;
+  isDeliveryEnabled?: boolean;
 }
 
 export default function DeliveryMethod({
@@ -13,6 +14,7 @@ export default function DeliveryMethod({
   isFreeDelivery,
   deliveryMethod,
   setForm,
+  isDeliveryEnabled = true,
 }: DeliveryMethodProps) {
   return (
     <div id="delivery-config-section" className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5">
@@ -28,23 +30,25 @@ export default function DeliveryMethod({
         </div>
       )}
 
-      <div className="grid sm:grid-cols-2 gap-4">
-        <button 
-          type="button"
-          onClick={() => setForm((prev: any) => ({ ...prev, deliveryMethod: 'delivery' }))}
-          className={`cursor-pointer flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition-all duration-200 ${
-            deliveryMethod === 'delivery' 
-              ? 'border-[#F48B7D] bg-rose-50/40 shadow-sm' 
-              : 'border-orange-100 bg-white hover:border-orange-200'
-          }`}
-        >
-          <span className="text-2xl">🚚</span>
-          <span className="font-bold text-base sm:text-lg mt-2 text-gray-800">{t('delDirect')}</span>
-          <span className="text-sm sm:text-base text-[#F48B7D] font-bold mt-1">
-            {isFreeDelivery ? '0,00 €' : '5,00 €'}
-          </span>
-          <span className="text-xs text-gray-400 mt-1 uppercase tracking-wider font-medium">{t('delRegion')}</span>
-        </button>
+      <div className={`grid ${isDeliveryEnabled ? 'sm:grid-cols-2' : 'grid-cols-1'} gap-4`}>
+        {isDeliveryEnabled && (
+          <button 
+            type="button"
+            onClick={() => setForm((prev: any) => ({ ...prev, deliveryMethod: 'delivery' }))}
+            className={`cursor-pointer flex flex-col items-center justify-center p-5 rounded-2xl border text-center transition-all duration-200 ${
+              deliveryMethod === 'delivery' 
+                ? 'border-[#F48B7D] bg-rose-50/40 shadow-sm' 
+                : 'border-orange-100 bg-white hover:border-orange-200'
+            }`}
+          >
+            <span className="text-2xl">🚚</span>
+            <span className="font-bold text-base sm:text-lg mt-2 text-gray-800">{t('delDirect')}</span>
+            <span className="text-sm sm:text-base text-[#F48B7D] font-bold mt-1">
+              {isFreeDelivery ? '0,00 €' : '5,00 €'}
+            </span>
+            <span className="text-xs text-gray-400 mt-1 uppercase tracking-wider font-medium">{t('delRegion')}</span>
+          </button>
+        )}
 
         <button 
           type="button"

@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -132,7 +132,7 @@ export default function App() {
               </span>
             </div>
             <p className="text-xs text-gray-400">
-              © 2026 Velvet Crumbs. Handmade with love.
+              ┬® 2026 Velvet Crumbs. Handmade with love.
             </p>
           </div>
 

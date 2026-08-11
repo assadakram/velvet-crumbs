@@ -9,4 +9,5 @@ export interface PreorderSettings {
   resumeTime: string | null;        // HH:mm
   pausedMessageEn: string | null;
   pausedMessageFi: string | null;
+  isDeliveryEnabled?: boolean;
 }

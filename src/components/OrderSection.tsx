@@ -90,6 +90,7 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
   const [preorderSettings, setPreorderSettings] = useState<PreorderSettings | null>(null);
   const [serverOffset, setServerOffset] = useState<number>(0);
   const [isSettingsLoading, setIsSettingsLoading] = useState(true);
+  const [isDeliveryEnabled, setIsDeliveryEnabled] = useState(true);
 
   const resumeDateObj = useMemo(() => {
     if (!preorderSettings || !preorderSettings.resumeDate) return null;
@@ -152,7 +153,15 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
   useEffect(() => {
     fetch('/api/preorder-settings')
       .then(res => res.json())
-      .then((data: PreorderSettings) => { if (data) setPreorderSettings(data); })
+      .then((data: PreorderSettings) => {
+        if (data) {
+          setPreorderSettings(data);
+          if (data.isDeliveryEnabled === false) {
+            setIsDeliveryEnabled(false);
+            setForm(prev => ({ ...prev, deliveryMethod: 'pickup' }));
+          }
+        }
+      })
       .catch(err => console.error('Failed to fetch pre-order settings:', err))
       .finally(() => setIsSettingsLoading(false));
   }, []);
@@ -435,12 +444,26 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
                 />
 
                 {/* Step 5: Deliver configurations */}
-                <DeliveryMethod
-                  t={t}
-                  isFreeDelivery={isFreeDelivery}
-                  deliveryMethod={form.deliveryMethod}
-                  setForm={setForm}
-                />
+                {isSettingsLoading ? (
+                  <div className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5 animate-pulse">
+                    <div className="flex items-center gap-3 border-b border-orange-100 pb-3">
+                      <div className="h-7 w-7 rounded-full bg-rose-100/50"></div>
+                      <div className="h-6 w-32 bg-rose-100/50 rounded"></div>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="h-32 bg-white rounded-2xl border border-orange-100"></div>
+                      <div className="h-32 bg-white rounded-2xl border border-orange-100"></div>
+                    </div>
+                  </div>
+                ) : (
+                  <DeliveryMethod
+                    t={t}
+                    isFreeDelivery={isFreeDelivery}
+                    deliveryMethod={form.deliveryMethod}
+                    setForm={setForm}
+                    isDeliveryEnabled={isDeliveryEnabled}
+                  />
+                )}
 
                 {/* Checkout CTA block */}
                 <CheckoutCTA
