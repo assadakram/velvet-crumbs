@@ -15,7 +15,9 @@ export async function POST(req: NextRequest) {
       timeSlot,
       orderLines,
       specialRequests,
-      estimatedTotal
+      estimatedTotal,
+      appliedCoupon,
+      discountAmount
     } = body;
 
     // Check if SMTP environment variables are configured
@@ -109,6 +111,20 @@ export async function POST(req: NextRequest) {
           <div style="margin-bottom: 24px; background-color: #fff8e1; border: 1px solid #ffe082; border-radius: 12px; padding: 16px;">
             <h3 style="color: #f57f17; font-size: 14px; margin-top: 0; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Special Requests / Dietaries</h3>
             <p style="margin: 0; font-size: 14px; line-height: 1.4; color: #5d4037;">${specialRequests}</p>
+          </div>
+          ` : ''}
+
+          <!-- Discount Details -->
+          ${appliedCoupon ? `
+          <div style="margin-bottom: 24px; background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px;">
+            <h3 style="color: #166534; font-size: 14px; margin-top: 0; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Promo Code Applied</h3>
+            <p style="margin: 0; font-size: 14px; line-height: 1.4; color: #14532d;">
+              <strong>${appliedCoupon.code}</strong> 
+              (-${appliedCoupon.discountType === 'percentage' ? appliedCoupon.discountValue + '%' : appliedCoupon.discountValue + '€'})
+            </p>
+            <p style="margin: 4px 0 0 0; font-size: 14px; font-weight: bold; color: #16a34a;">
+              Discount Amount: -${Number(discountAmount).toFixed(2).replace('.', ',')} €
+            </p>
           </div>
           ` : ''}
 

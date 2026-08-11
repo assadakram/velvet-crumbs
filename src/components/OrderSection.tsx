@@ -3,12 +3,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Clock } from 'lucide-react';
 
-import CookieSelection from './checkout/CookieSelection';
+import CookieSelection from './checkout/ProductSelection';
 import SpecialRequests from './checkout/SpecialRequests';
 import ContactDetails from './checkout/ContactDetails';
 import DateTimeSelection from './checkout/DateTimeSelection';
 import DeliveryMethod from './checkout/DeliveryMethod';
 import CheckoutCTA from './checkout/CheckoutCTA';
+import PromoCode, { Coupon } from './checkout/PromoCode';
 
 import { COOKIES } from '../constants/cookies';
 import type { PreorderSettings } from '../lib/preorderQueries';
@@ -91,6 +92,7 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
   const [serverOffset, setServerOffset] = useState<number>(0);
   const [isSettingsLoading, setIsSettingsLoading] = useState(true);
   const [isDeliveryEnabled, setIsDeliveryEnabled] = useState(true);
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
   const resumeDateObj = useMemo(() => {
     if (!preorderSettings || !preorderSettings.resumeDate) return null;
@@ -197,7 +199,7 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
     if (dateInput) dateInput.setAttribute('min', minDate);
   }, [serverOffset]);
 
-  const { totalCookiesCount, isFreeDelivery, finalTotal, funfettiBonusCount } = useMemo(() => {
+  const { totalCookiesCount, isFreeDelivery, finalTotal, funfettiBonusCount, discountAmount } = useMemo(() => {
     let count = 0;
     let cost = 0;
     Object.keys(cart).forEach(id => {
@@ -206,6 +208,19 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
       count += q;
       cost += q * (cookieObj ? cookieObj.price : 0);
     });
+    
+    // Apply discount if there is an applied coupon
+    let discount = 0;
+    if (appliedCoupon) {
+      if (appliedCoupon.discountType === 'percentage') {
+        discount = cost * (appliedCoupon.discountValue / 100);
+      } else if (appliedCoupon.discountType === 'fixed') {
+        discount = appliedCoupon.discountValue;
+      }
+      // Ensure discount doesn't exceed cost
+      if (discount > cost) discount = cost;
+    }
+    
     const freeDeliveryQualified = count >= 6;
     let delFee = 0;
     if (form.deliveryMethod === 'delivery') {
@@ -216,10 +231,11 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
       totalCookiesCount: count,
       isFreeDelivery: freeDeliveryQualified,
       deliveryFee: delFee,
-      finalTotal: cost + delFee,
+      discountAmount: discount,
+      finalTotal: (cost - discount) + delFee,
       funfettiBonusCount: funfettiCount
     };
-  }, [cart, form.deliveryMethod]);
+  }, [cart, form.deliveryMethod, appliedCoupon]);
 
   const updateQuantity = (id: string, change: number) => {
     setCart(prev => {
@@ -314,6 +330,7 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
       `*${lang === 'en' ? 'Delivery' : 'Toimitustapa'}:* ${deliveryMethodLabel}\n\n` +
       `*${lang === 'en' ? 'Box Selection' : 'Laatikon sisältö'}:*\n${cookieLines}\n` +
       (form.specialRequests ? `*${lang === 'en' ? 'Special wishes' : 'Toiveet'}:* ${form.specialRequests}\n\n` : '') +
+      (appliedCoupon ? `*${lang === 'en' ? 'Promo Code' : 'Alennuskoodi'} (${appliedCoupon.code}):* -${discountAmount.toFixed(2).replace('.', ',')} €\n` : '') +
       `*${lang === 'en' ? 'Estimated Total' : 'Arvioitu summa'}:* ${finalTotal.toFixed(2).replace('.', ',')} €\n\n` +
       `${bottomGreet}`;
 
@@ -424,7 +441,6 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
                   t={t}
                   cart={cart}
                   updateQuantity={updateQuantity}
-                  totalCookiesCount={totalCookiesCount}
                   funfettiBonusCount={funfettiBonusCount}
                 />
 
@@ -471,10 +487,18 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
                   />
                 )}
 
+                {/* Promo Code section */}
+                <PromoCode 
+                  appliedCoupon={appliedCoupon} 
+                  setAppliedCoupon={setAppliedCoupon} 
+                  disabled={isRedirecting || totalCookiesCount === 0} 
+                />
+
                 {/* Checkout CTA block */}
                 <CheckoutCTA
                   t={t}
                   finalTotal={finalTotal}
+                  discountAmount={discountAmount}
                   paymentAcknowledge={paymentAcknowledge}
                   setPaymentAcknowledge={setPaymentAcknowledge}
                   validationError={validationError}
