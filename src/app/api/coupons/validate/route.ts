@@ -1,0 +1,48 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { list } from '@vercel/blob';
+
+export const dynamic = 'force-dynamic';
+
+const BLOB_FILENAME = 'coupons.json';
+
+export async function POST(req: NextRequest) {
+  try {
+    const { code } = await req.json();
+
+    if (!code) {
+      return NextResponse.json({ error: 'Promo code is required' }, { status: 400 });
+    }
+
+    const { blobs } = await list({ prefix: 'coupons' });
+    blobs.sort((a, b) => b.uploadedAt.getTime() - a.uploadedAt.getTime());
+    const couponBlob = blobs[0];
+
+    if (!couponBlob) {
+      return NextResponse.json({ error: 'Invalid or expired promo code' }, { status: 404 });
+    }
+
+    // Add timestamp to bypass Vercel Edge CDN cache (just in case, though unique URLs shouldn't be cached)
+    const response = await fetch(`${couponBlob.url}?t=${Date.now()}`, {
+      cache: 'no-store',
+      headers: {
+        'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
+      },
+    });
+    const coupons = await response.json();
+
+    const coupon = coupons.find((c: any) => c.code.toUpperCase() === code.toUpperCase());
+
+    if (!coupon) {
+      return NextResponse.json({ error: 'Invalid or expired promo code' }, { status: 404 });
+    }
+
+    if (!coupon.isActive) {
+      return NextResponse.json({ error: 'This promo code is no longer active' }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true, coupon });
+  } catch (error) {
+    console.error('Error validating coupon:', error);
+    return NextResponse.json({ error: 'Failed to validate coupon' }, { status: 500 });
+  }
+}

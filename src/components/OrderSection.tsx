@@ -3,12 +3,13 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Clock } from 'lucide-react';
 
-import CookieSelection from './checkout/CookieSelection';
+import CookieSelection from './checkout/ProductSelection';
 import SpecialRequests from './checkout/SpecialRequests';
 import ContactDetails from './checkout/ContactDetails';
 import DateTimeSelection from './checkout/DateTimeSelection';
 import DeliveryMethod from './checkout/DeliveryMethod';
 import CheckoutCTA from './checkout/CheckoutCTA';
+import PromoCode, { Coupon } from './checkout/PromoCode';
 
 import { COOKIES } from '../constants/cookies';
 import type { PreorderSettings } from '../lib/preorderQueries';
@@ -90,6 +91,8 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
   const [preorderSettings, setPreorderSettings] = useState<PreorderSettings | null>(null);
   const [serverOffset, setServerOffset] = useState<number>(0);
   const [isSettingsLoading, setIsSettingsLoading] = useState(true);
+  const [isDeliveryEnabled, setIsDeliveryEnabled] = useState(true);
+  const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
 
   const resumeDateObj = useMemo(() => {
     if (!preorderSettings || !preorderSettings.resumeDate) return null;
@@ -151,8 +154,19 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
   // Fetch pre-order settings
   useEffect(() => {
     fetch('/api/preorder-settings')
-      .then(res => res.json())
-      .then((data: PreorderSettings) => { if (data) setPreorderSettings(data); })
+      .then(res => {
+        if (!res.ok) throw new Error(`Settings API returned ${res.status}`);
+        return res.json();
+      })
+      .then((data: PreorderSettings) => {
+        if (data) {
+          setPreorderSettings(data);
+          if (data.isDeliveryEnabled === false) {
+            setIsDeliveryEnabled(false);
+            setForm(prev => ({ ...prev, deliveryMethod: 'pickup' }));
+          }
+        }
+      })
       .catch(err => console.error('Failed to fetch pre-order settings:', err))
       .finally(() => setIsSettingsLoading(false));
   }, []);
@@ -160,7 +174,10 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
   // Fetch server time offset
   useEffect(() => {
     fetch('/api/time')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`Time API returned ${res.status}`);
+        return res.json();
+      })
       .then(data => {
         if (data.serverTime) {
           const clientNow = Date.now();
@@ -182,7 +199,7 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
     if (dateInput) dateInput.setAttribute('min', minDate);
   }, [serverOffset]);
 
-  const { totalCookiesCount, isFreeDelivery, finalTotal, funfettiBonusCount } = useMemo(() => {
+  const { totalCookiesCount, isFreeDelivery, finalTotal, funfettiBonusCount, discountAmount } = useMemo(() => {
     let count = 0;
     let cost = 0;
     Object.keys(cart).forEach(id => {
@@ -191,6 +208,19 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
       count += q;
       cost += q * (cookieObj ? cookieObj.price : 0);
     });
+    
+    // Apply discount if there is an applied coupon
+    let discount = 0;
+    if (appliedCoupon) {
+      if (appliedCoupon.discountType === 'percentage') {
+        discount = cost * (appliedCoupon.discountValue / 100);
+      } else if (appliedCoupon.discountType === 'fixed') {
+        discount = appliedCoupon.discountValue;
+      }
+      // Ensure discount doesn't exceed cost
+      if (discount > cost) discount = cost;
+    }
+    
     const freeDeliveryQualified = count >= 6;
     let delFee = 0;
     if (form.deliveryMethod === 'delivery') {
@@ -201,10 +231,11 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
       totalCookiesCount: count,
       isFreeDelivery: freeDeliveryQualified,
       deliveryFee: delFee,
-      finalTotal: cost + delFee,
+      discountAmount: discount,
+      finalTotal: (cost - discount) + delFee,
       funfettiBonusCount: funfettiCount
     };
-  }, [cart, form.deliveryMethod]);
+  }, [cart, form.deliveryMethod, appliedCoupon]);
 
   const updateQuantity = (id: string, change: number) => {
     setCart(prev => {
@@ -299,6 +330,7 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
       `*${lang === 'en' ? 'Delivery' : 'Toimitustapa'}:* ${deliveryMethodLabel}\n\n` +
       `*${lang === 'en' ? 'Box Selection' : 'Laatikon sisältö'}:*\n${cookieLines}\n` +
       (form.specialRequests ? `*${lang === 'en' ? 'Special wishes' : 'Toiveet'}:* ${form.specialRequests}\n\n` : '') +
+      (appliedCoupon ? `*${lang === 'en' ? 'Promo Code' : 'Alennuskoodi'} (${appliedCoupon.code}):* -${discountAmount.toFixed(2).replace('.', ',')} €\n` : '') +
       `*${lang === 'en' ? 'Estimated Total' : 'Arvioitu summa'}:* ${finalTotal.toFixed(2).replace('.', ',')} €\n\n` +
       `${bottomGreet}`;
 
@@ -409,7 +441,6 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
                   t={t}
                   cart={cart}
                   updateQuantity={updateQuantity}
-                  totalCookiesCount={totalCookiesCount}
                   funfettiBonusCount={funfettiBonusCount}
                 />
 
@@ -435,17 +466,39 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
                 />
 
                 {/* Step 5: Deliver configurations */}
-                <DeliveryMethod
-                  t={t}
-                  isFreeDelivery={isFreeDelivery}
-                  deliveryMethod={form.deliveryMethod}
-                  setForm={setForm}
+                {isSettingsLoading ? (
+                  <div className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5 animate-pulse">
+                    <div className="flex items-center gap-3 border-b border-orange-100 pb-3">
+                      <div className="h-7 w-7 rounded-full bg-rose-100/50"></div>
+                      <div className="h-6 w-32 bg-rose-100/50 rounded"></div>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="h-32 bg-white rounded-2xl border border-orange-100"></div>
+                      <div className="h-32 bg-white rounded-2xl border border-orange-100"></div>
+                    </div>
+                  </div>
+                ) : (
+                  <DeliveryMethod
+                    t={t}
+                    isFreeDelivery={isFreeDelivery}
+                    deliveryMethod={form.deliveryMethod}
+                    setForm={setForm}
+                    isDeliveryEnabled={isDeliveryEnabled}
+                  />
+                )}
+
+                {/* Promo Code section */}
+                <PromoCode 
+                  appliedCoupon={appliedCoupon} 
+                  setAppliedCoupon={setAppliedCoupon} 
+                  disabled={isRedirecting || totalCookiesCount === 0} 
                 />
 
                 {/* Checkout CTA block */}
                 <CheckoutCTA
                   t={t}
                   finalTotal={finalTotal}
+                  discountAmount={discountAmount}
                   paymentAcknowledge={paymentAcknowledge}
                   setPaymentAcknowledge={setPaymentAcknowledge}
                   validationError={validationError}

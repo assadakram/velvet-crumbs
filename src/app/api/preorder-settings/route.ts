@@ -3,13 +3,13 @@ import crypto from 'crypto';
 import { cookies } from 'next/headers';
 import { put, list } from '@vercel/blob';
 
-// Default settings used if the file hasn't been created yet on Vercel Blob
 const DEFAULT_SETTINGS = {
   isPaused: false,
   resumeDate: null,
   resumeTime: null,
   pausedMessageEn: null,
   pausedMessageFi: null,
+  isDeliveryEnabled: true,
 };
 
 async function readSettings() {
@@ -107,6 +107,7 @@ export async function POST(req: NextRequest) {
       resumeTime: body.resumeTime?.trim() || null,
       pausedMessageEn: body.pausedMessageEn?.trim() || null,
       pausedMessageFi: body.pausedMessageFi?.trim() || null,
+      isDeliveryEnabled: body.isDeliveryEnabled !== undefined ? Boolean(body.isDeliveryEnabled) : true,
     };
 
     await writeSettings(settings);
