@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
@@ -52,6 +52,7 @@ export default function App() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [whatsappUrl, setWhatsappUrl] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  const [isDeliveryEnabled, setIsDeliveryEnabled] = useState(true);
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
@@ -71,6 +72,19 @@ export default function App() {
         setLang(queryLang);
       }
     }
+  }, []);
+
+  // Fetch delivery enabled setting from API
+  useEffect(() => {
+    fetch('/api/preorder-settings')
+      .then(res => res.ok ? res.json() : null)
+      .then((data) => {
+        if (data && data.isDeliveryEnabled === false) {
+          setIsDeliveryEnabled(false);
+          setForm(prev => ({ ...prev, deliveryMethod: 'pickup' }));
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Auto-scroll on page load removed as requested by user
@@ -413,6 +427,7 @@ export default function App() {
                 isFreeDelivery={isFreeDelivery}
                 deliveryMethod={form.deliveryMethod}
                 setForm={setForm}
+                isDeliveryEnabled={isDeliveryEnabled}
               />
 
               {/* Promo Code section */}
