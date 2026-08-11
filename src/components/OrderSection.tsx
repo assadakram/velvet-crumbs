@@ -152,7 +152,10 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
   // Fetch pre-order settings
   useEffect(() => {
     fetch('/api/preorder-settings')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`Settings API returned ${res.status}`);
+        return res.json();
+      })
       .then((data: PreorderSettings) => {
         if (data) {
           setPreorderSettings(data);
@@ -169,7 +172,10 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
   // Fetch server time offset
   useEffect(() => {
     fetch('/api/time')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) throw new Error(`Time API returned ${res.status}`);
+        return res.json();
+      })
       .then(data => {
         if (data.serverTime) {
           const clientNow = Date.now();
