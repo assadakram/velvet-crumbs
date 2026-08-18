@@ -125,7 +125,7 @@ export default function App() {
       if (discount > cost) discount = cost;
     }
 
-    const freeDeliveryQualified = count >= 6;
+    const freeDeliveryQualified = cost >= 24.989;
     let delFee = 0;
     
     if (form.deliveryMethod === 'delivery') {

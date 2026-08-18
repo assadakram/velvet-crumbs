@@ -208,7 +208,7 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
       count += q;
       cost += q * (cookieObj ? cookieObj.price : 0);
     });
-    
+
     // Apply discount if there is an applied coupon
     let discount = 0;
     if (appliedCoupon) {
@@ -220,8 +220,8 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
       // Ensure discount doesn't exceed cost
       if (discount > cost) discount = cost;
     }
-    
-    const freeDeliveryQualified = count >= 6;
+
+    const freeDeliveryQualified = cost >= 24.989;
     let delFee = 0;
     if (form.deliveryMethod === 'delivery') {
       delFee = freeDeliveryQualified ? 0 : 5.00;
@@ -488,10 +488,10 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
                 )}
 
                 {/* Promo Code section */}
-                <PromoCode 
-                  appliedCoupon={appliedCoupon} 
-                  setAppliedCoupon={setAppliedCoupon} 
-                  disabled={isRedirecting || totalCookiesCount === 0} 
+                <PromoCode
+                  appliedCoupon={appliedCoupon}
+                  setAppliedCoupon={setAppliedCoupon}
+                  disabled={isRedirecting || totalCookiesCount === 0}
                 />
 
                 {/* Checkout CTA block */}
@@ -524,11 +524,10 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
 
       {/* Toast Notification */}
       {toast.type && (
-        <div className={`fixed bottom-5 right-5 z-50 flex items-center gap-2 px-5 py-3.5 rounded-2xl shadow-xl border text-sm font-bold animate-bounce ${
-          toast.type === 'success'
+        <div className={`fixed bottom-5 right-5 z-50 flex items-center gap-2 px-5 py-3.5 rounded-2xl shadow-xl border text-sm font-bold animate-bounce ${toast.type === 'success'
             ? 'bg-emerald-50 border-emerald-100 text-emerald-800'
             : 'bg-rose-50 border-rose-100 text-rose-800'
-        }`}>
+          }`}>
           <span>{toast.type === 'success' ? '✨' : '⚠️'}</span>
           <span>{toast.message}</span>
         </div>
