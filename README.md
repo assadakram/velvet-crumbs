@@ -42,7 +42,7 @@ Additionally, the application includes a secure **Admin Management Panel (`/admi
 2. **Scheduled Auto-Resume**: Set a specific resume date (YYYY-MM-DD) and time (HH:mm) in Europe/Helsinki time. Displays a live countdown timer to prospective customers.
 3. **Custom Bilingual Notices**: Set custom pause announcements in both English and Finnish to inform customers when pre-orders reopen.
 4. **Secure Authentication**: Authenticates via `ADMIN_SECRET` using secure HttpOnly session cookies (`velvet_admin_session`) or header tokens (`x-admin-secret`).
-5. **Vercel Blob Remote Persistence**: Settings persist in cloud storage via `@vercel/blob` (`preorder-settings.json`) with edge cache bypass to ensure instant updates.
+5. **Firebase Cloud Firestore Persistence**: Settings and promotional coupons persist in real-time cloud storage via Firebase Firestore with zero hosting costs.
 6. **Server-Time Synchronization**: `GET /api/time` provides UTC server timestamps aligned with `Europe/Helsinki` time to ensure clock accuracy across devices.
 
 ---
@@ -51,7 +51,7 @@ Additionally, the application includes a secure **Admin Management Panel (`/admi
 
 * **Core Framework**: [Next.js 16](https://nextjs.org/) (App Router)
 * **UI & Rendering**: React 19 (Client & Server Components)
-* **State & Data Storage**: [Vercel Blob Storage (`@vercel/blob`)](https://vercel.com/docs/storage/vercel-blob) for remote pre-order settings persistence
+* **State & Data Storage**: [Firebase Cloud Firestore (`firebase-admin`)](https://firebase.google.com/docs/firestore) for persistent pre-order settings and coupon codes
 * **Email System**: [Nodemailer](https://nodemailer.com/) (Gmail SMTP with HTML receipt template & conditional BCC)
 * **Styling**: [Tailwind CSS v4](https://tailwindcss.com/) with a custom warm color palette (`#FFF9F5` background, `#F48B7D` primary accent)
 * **Icons**: [Lucide React](https://lucide.dev/) (with custom SVG overrides for TikTok, Instagram, and Facebook)
@@ -69,10 +69,14 @@ velvet_crumbs_next_gen_pre_order_app/
 │   │   ├── admin/
 │   │   │   └── page.tsx       # Admin management dashboard (/admin)
 │   │   ├── api/
+│   │   │   ├── admin/
+│   │   │   │   └── coupons/   # Coupon management API (Firestore)
+│   │   │   ├── coupons/
+│   │   │   │   └── validate/  # Coupon validation API (Firestore)
 │   │   │   ├── order/
 │   │   │   │   └── route.ts   # Order processing & Nodemailer email endpoint
 │   │   │   ├── preorder-settings/
-│   │   │   │   ├── route.ts   # GET/POST pre-order status & Vercel Blob sync
+│   │   │   │   ├── route.ts   # GET/POST pre-order status & Firestore sync
 │   │   │   │   ├── login/
 │   │   │   │   │   └── route.ts # Admin secret authentication endpoint
 │   │   │   │   └── logout/
@@ -93,6 +97,7 @@ velvet_crumbs_next_gen_pre_order_app/
 │   │   │   ├── CookieSelection.tsx
 │   │   │   ├── DateTimeSelection.tsx
 │   │   │   ├── DeliveryMethod.tsx
+│   │   │   ├── PromoCode.tsx
 │   │   │   └── SpecialRequests.tsx
 │   │   ├── CookieMenu.tsx      # Signature cookie menu display
 │   │   ├── Hero.tsx            # Hero section with primary calls-to-action
@@ -104,6 +109,7 @@ velvet_crumbs_next_gen_pre_order_app/
 │   │   ├── cookies.ts          # Cookie menu definitions & pricing
 │   │   └── translations.ts     # EN / FI translation strings
 │   └── lib/
+│       ├── firebaseAdmin.ts    # Firebase Admin SDK & Firestore singleton
 │       └── preorderQueries.ts  # TypeScript definitions for preorder settings
 ├── .env.example               # Template environment variables configuration
 ├── next.config.ts             # Next.js configuration
@@ -119,7 +125,9 @@ velvet_crumbs_next_gen_pre_order_app/
 | :--- | :--- | :--- | :--- |
 | `/api/order` | `POST` | Public | Validates order payload, sends Nodemailer HTML email, and returns order summary for WhatsApp redirect. |
 | `/api/preorder-settings` | `GET` | Public / Admin | Returns current pause status, scheduled resume date/time, and custom messages. Accepts `x-admin-validate: true` header to check auth. |
-| `/api/preorder-settings` | `POST` | Admin | Updates pause/resume settings in Vercel Blob storage. Requires admin cookie or `x-admin-secret` header. |
+| `/api/preorder-settings` | `POST` | Admin | Updates pause/resume settings in Firestore. Requires admin cookie or `x-admin-secret` header. |
+| `/api/admin/coupons` | `GET` / `POST` | Admin | Retrieves, creates, updates, and deletes promo coupon codes. |
+| `/api/coupons/validate` | `POST` | Public | Validates customer promo codes at checkout. |
 | `/api/preorder-settings/login` | `POST` | Public | Validates `secret` against `ADMIN_SECRET` and sets an HttpOnly `velvet_admin_session` cookie. |
 | `/api/preorder-settings/logout` | `POST` | Admin | Clears the `velvet_admin_session` cookie. |
 | `/api/time` | `GET` | Public | Returns server ISO time string (`{ serverTime }`) to ensure accurate client countdown timers. |
@@ -156,8 +164,10 @@ NEXT_PUBLIC_WHATSAPP_NUMBER=358413170359
 # Admin Dashboard Secret
 ADMIN_SECRET=your_secure_admin_secret_key
 
-# Vercel Blob Storage Token (For persisting preorder settings)
-BLOB_READ_WRITE_TOKEN=vercel_blob_rw_xxxxxxxxxxxx
+# Firebase Admin SDK Configuration (Cloud Firestore)
+FIREBASE_PROJECT_ID=your-firebase-project-id
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project-id.iam.gserviceaccount.com
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkq...\n-----END PRIVATE KEY-----\n"
 ```
 
 ### 3. Run Development Server

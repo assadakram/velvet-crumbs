@@ -300,7 +300,7 @@ export default function AdminPage() {
   // Show a full-screen loading spinner while checking authentication on mount
   if (initializing) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#FFF9F5] via-[#fff4ef] to-[#ffe8df] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-10 w-10 text-[#F48B7D] animate-spin" />
       </div>
     );
@@ -405,7 +405,7 @@ export default function AdminPage() {
 
   // ── Admin Dashboard ──────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFF9F5] via-[#fff4ef] to-[#ffe8df]">
+    <>
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-orange-100 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -843,6 +843,6 @@ export default function AdminPage() {
           <span>{toast.message}</span>
         </div>
       )}
-    </div>
+    </>
   );
 }

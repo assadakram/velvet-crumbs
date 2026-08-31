@@ -4,7 +4,8 @@ import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { 
   Globe, 
-  AlertTriangle
+  AlertTriangle,
+  Clock
 } from 'lucide-react';
 
 import { TikTokIcon, Instagram, Facebook } from '../components/Icons';
@@ -23,10 +24,52 @@ import PromoCode, { Coupon } from '../components/checkout/PromoCode';
 import { COOKIES } from '../constants/cookies';
 import { BROWNIES, BOXES } from '../constants/brownies';
 import { TRANSLATIONS } from '../constants/translations';
+import type { PreorderSettings } from '../lib/preorderQueries';
 
 const ALL_PRODUCTS = [...COOKIES, ...BROWNIES, ...BOXES];
 
 const WHATSAPP_NUMBER = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '358413170359';
+
+/**
+ * Helper to parse a date and time string in the Europe/Helsinki timezone
+ * and return a standard JavaScript Date object.
+ */
+function parseHelsinkiTime(dateStr: string, timeStr: string): Date {
+  try {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const [hour, minute] = timeStr.split(':').map(Number);
+
+    const utcDate = new Date(Date.UTC(year, month - 1, day, hour, minute));
+
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'Europe/Helsinki',
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      second: 'numeric',
+      hour12: false,
+    });
+
+    const parts = formatter.formatToParts(utcDate);
+    const partVal = (type: string) => Number(parts.find(p => p.type === type)?.value);
+
+    const hYear = partVal('year');
+    const hMonth = partVal('month');
+    const hDay = partVal('day');
+    const hHour = partVal('hour');
+    const hMinute = partVal('minute');
+
+    const helsinkiLocalAsUtc = Date.UTC(hYear, hMonth - 1, hDay, hHour, hMinute);
+    const offset = helsinkiLocalAsUtc - utcDate.getTime();
+
+    return new Date(utcDate.getTime() - offset);
+  } catch (e) {
+    console.error("Failed to parse Helsinki timezone date", e);
+    return new Date(`${dateStr}T${timeStr}:00`);
+  }
+}
 
 export default function App() {
   const [lang, setLang] = useState('en');
@@ -52,6 +95,11 @@ export default function App() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [whatsappUrl, setWhatsappUrl] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
+  
+  // Preorder settings state from Firestore
+  const [preorderSettings, setPreorderSettings] = useState<PreorderSettings | null>(null);
+  const [serverOffset, setServerOffset] = useState<number>(0);
+  const [isSettingsLoading, setIsSettingsLoading] = useState(true);
   const [isDeliveryEnabled, setIsDeliveryEnabled] = useState(true);
 
   const showToast = (message: string, type: 'success' | 'error') => {
@@ -74,20 +122,92 @@ export default function App() {
     }
   }, []);
 
-  // Fetch delivery enabled setting from API
+  // Fetch pre-order settings from Firestore API (with cache buster)
   useEffect(() => {
-    fetch('/api/preorder-settings')
+    fetch(`/api/preorder-settings?t=${Date.now()}`, { cache: 'no-store' })
       .then(res => res.ok ? res.json() : null)
-      .then((data) => {
-        if (data && data.isDeliveryEnabled === false) {
-          setIsDeliveryEnabled(false);
-          setForm(prev => ({ ...prev, deliveryMethod: 'pickup' }));
+      .then((data: PreorderSettings | null) => {
+        if (data) {
+          setPreorderSettings(data);
+          if (data.isDeliveryEnabled === false) {
+            setIsDeliveryEnabled(false);
+            setForm(prev => ({ ...prev, deliveryMethod: 'pickup' }));
+          } else {
+            setIsDeliveryEnabled(true);
+          }
+        }
+      })
+      .catch((err) => console.error('Failed to load pre-order settings:', err))
+      .finally(() => setIsSettingsLoading(false));
+  }, []);
+
+  // Fetch server time offset
+  useEffect(() => {
+    fetch('/api/time')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => {
+        if (data?.serverTime) {
+          const sTime = new Date(data.serverTime).getTime();
+          const cTime = Date.now();
+          setServerOffset(sTime - cTime);
         }
       })
       .catch(() => {});
   }, []);
 
-  // Auto-scroll on page load removed as requested by user
+  const resumeDateObj = useMemo(() => {
+    if (!preorderSettings || !preorderSettings.resumeDate) return null;
+    const timeStr = preorderSettings.resumeTime && /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/.test(preorderSettings.resumeTime.trim())
+      ? preorderSettings.resumeTime.trim()
+      : '00:00';
+    return parseHelsinkiTime(preorderSettings.resumeDate, timeStr);
+  }, [preorderSettings]);
+
+  const isCurrentlyPaused = useMemo(() => {
+    if (!preorderSettings) return false;
+    if (!preorderSettings.isPaused) return false;
+    if (resumeDateObj) {
+      const now = new Date(Date.now() + serverOffset);
+      if (now >= resumeDateObj) return false;
+    }
+    return true;
+  }, [preorderSettings, resumeDateObj, serverOffset]);
+
+  const resumeStr = useMemo(() => {
+    if (!resumeDateObj) return '';
+    const datePart = resumeDateObj.toLocaleDateString(lang === 'fi' ? 'fi-FI' : 'en-US', {
+      timeZone: 'Europe/Helsinki',
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long'
+    });
+    const timePart = resumeDateObj.toLocaleTimeString(lang === 'fi' ? 'fi-FI' : 'en-US', {
+      timeZone: 'Europe/Helsinki',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: lang !== 'fi'
+    });
+    const capitalizedDate = datePart.charAt(0).toUpperCase() + datePart.slice(1);
+    if (lang === 'fi') {
+      return `Jatkuu: ${capitalizedDate} klo ${timePart}`;
+    }
+    return `Resuming: ${capitalizedDate} at ${timePart}`;
+  }, [resumeDateObj, lang]);
+
+  const pausedMessage = useMemo(() => {
+    if (!preorderSettings) return '';
+    const customMsg = lang === 'fi' ? preorderSettings.pausedMessageFi : preorderSettings.pausedMessageEn;
+    if (customMsg) return customMsg;
+    if (lang === 'fi') {
+      return resumeStr
+        ? `Olemme tällä hetkellä täynnä. Ennakkotilaukset jatkuvat ${resumeStr.replace('Jatkuu: ', '')}. Seuraa meitä Instagramissa saadaksesi päivityksiä!`
+        : `Olemme tällä hetkellä täynnä emmekä ota uusia tilauksia. Seuraa meitä Instagramissa saadaksesi tiedon, kun tilaukset avautuvat uudelleen!`;
+    } else {
+      return resumeStr
+        ? `We are currently fully booked. Pre-orders will resume on ${resumeStr.replace('Resuming: ', '')}. Follow us on Instagram for updates!`
+        : `We're currently fully booked and not accepting new orders. Follow us on Instagram for updates on when pre-orders reopen!`;
+    }
+  }, [preorderSettings, resumeStr, lang]);
 
   // Sync date selection min attribute dynamically
   useEffect(() => {
@@ -159,6 +279,16 @@ export default function App() {
   const handleOrderSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setValidationError('');
+
+    if (isCurrentlyPaused) {
+      showToast(
+        lang === 'fi'
+          ? 'Ennakkotilaukset ovat tällä hetkellä tauolla.'
+          : 'Pre-orders are currently paused.',
+        'error'
+      );
+      return;
+    }
 
     if (totalCookiesCount === 0) {
       setValidationError(t('alertValidCart'));
@@ -389,76 +519,133 @@ export default function App() {
           </div>
 
           <div id="order-builder-section" className="max-w-3xl mx-auto">
-            <form onSubmit={handleOrderSubmit} className="space-y-8">
-              
-              {/* Step 1: Cookie selection stepper */}
-              <ProductSelection 
-                lang={lang} 
-                t={t} 
-                cart={cart} 
-                updateQuantity={updateQuantity} 
-                funfettiBonusCount={funfettiBonusCount} 
-              />
-
-              {/* Step 2: Special dietary requests */}
-              <SpecialRequests
-                t={t}
-                specialRequests={form.specialRequests}
-                handleInputChange={handleInputChange}
-              />
-
-              {/* Step 3: Contact details */}
-              <ContactDetails
-                t={t}
-                form={form}
-                handleInputChange={handleInputChange}
-              />
-
-              {/* Step 4: Date, time slots & delivery methods */}
-              <DateTimeSelection
-                t={t}
-                form={form}
-                handleInputChange={handleInputChange}
-              />
-
-              {/* Step 5: Deliver configurations */}
-              <DeliveryMethod
-                t={t}
-                isFreeDelivery={isFreeDelivery}
-                deliveryMethod={form.deliveryMethod}
-                setForm={setForm}
-                isDeliveryEnabled={isDeliveryEnabled}
-              />
-
-              {/* Promo Code section */}
-              <PromoCode 
-                appliedCoupon={appliedCoupon} 
-                setAppliedCoupon={setAppliedCoupon} 
-                disabled={isRedirecting || totalCookiesCount === 0} 
-              />
-
-              {/* Checkout CTA block */}
-              <CheckoutCTA
-                t={t}
-                finalTotal={finalTotal}
-                discountAmount={discountAmount}
-                paymentAcknowledge={paymentAcknowledge}
-                setPaymentAcknowledge={setPaymentAcknowledge}
-                validationError={validationError}
-                isRedirecting={isRedirecting}
-                handleOrderSubmit={handleOrderSubmit}
-              />
-
-              {isRedirecting && (
-                <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-6 text-center space-y-3 animate-pulse max-w-md mx-auto">
-                  <span className="text-3xl block">🍪✨</span>
-                  <h4 className="font-bold text-emerald-800 text-lg">{t('waRedirectTitle')}</h4>
-                  <p className="text-xs sm:text-sm text-emerald-700 leading-relaxed">
-                    {t('waRedirectDesc')}
-                  </p>
+            {isSettingsLoading ? (
+              /* Loading skeleton — prevents form flashing before pause banner appears */
+              <div className="space-y-5 animate-pulse max-w-3xl mx-auto">
+                <div className="h-10 bg-orange-50 rounded-2xl w-3/4 mx-auto" />
+                <div className="h-48 bg-orange-50 rounded-3xl" />
+                <div className="h-32 bg-orange-50 rounded-3xl" />
+                <div className="h-24 bg-orange-50 rounded-3xl" />
+              </div>
+            ) : isCurrentlyPaused ? (
+              <div className="bg-[#FFF9F5] rounded-3xl border border-orange-100 p-8 sm:p-12 text-center space-y-6 max-w-xl mx-auto shadow-sm">
+                <div className="mx-auto flex items-center justify-center w-16 h-16 rounded-full bg-gray-50 border-4 border-gray-200 text-gray-400">
+                  <Clock className="h-7 w-7" />
                 </div>
-              )}
-            </form>
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-[#F48B7D] block">
+                    Velvet Crumbs
+                  </span>
+                  <h3 className="text-2xl sm:text-3xl font-extrabold font-serif text-[#2D2D2D] leading-snug">
+                    {lang === 'fi' ? 'Tilaukset ovat tauolla' : 'Pre-Orders Are Paused'}
+                  </h3>
+                </div>
+                {resumeStr && (
+                  <div className="inline-flex items-center gap-2 bg-gray-150 border border-gray-200 text-gray-500 text-xs sm:text-sm font-bold px-4 py-2 rounded-full">
+                    <Clock className="h-3.5 w-3.5" />
+                    <span>{resumeStr}</span>
+                  </div>
+                )}
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed font-medium whitespace-pre-line">
+                  {pausedMessage}
+                </p>
+                <div className="pt-2">
+                  <a
+                    href="https://www.instagram.com/velvet.crumbs.fi?igsh=MWRlanN5cDF3Z3NwNA=="
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#F48B7D] text-white px-8 py-4 rounded-xl font-bold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all duration-200 cursor-pointer text-sm sm:text-base"
+                  >
+                    {lang === 'fi' ? 'Seuraa Instagramissa' : 'Follow on Instagram'}
+                  </a>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleOrderSubmit} className="space-y-8">
+                
+                {/* Step 1: Cookie selection stepper */}
+                <ProductSelection 
+                  lang={lang} 
+                  t={t} 
+                  cart={cart} 
+                  updateQuantity={updateQuantity} 
+                  funfettiBonusCount={funfettiBonusCount} 
+                />
+
+                {/* Step 2: Special dietary requests */}
+                <SpecialRequests
+                  t={t}
+                  specialRequests={form.specialRequests}
+                  handleInputChange={handleInputChange}
+                />
+
+                {/* Step 3: Contact details */}
+                <ContactDetails
+                  t={t}
+                  form={form}
+                  handleInputChange={handleInputChange}
+                />
+
+                {/* Step 4: Date, time slots & delivery methods */}
+                <DateTimeSelection
+                  t={t}
+                  form={form}
+                  handleInputChange={handleInputChange}
+                />
+
+                {/* Step 5: Deliver configurations */}
+                {isSettingsLoading ? (
+                  <div className="bg-[#FFF9F5]/40 border border-orange-100/50 p-6 sm:p-8 rounded-3xl space-y-5 animate-pulse">
+                    <div className="flex items-center gap-3 border-b border-orange-100 pb-3">
+                      <div className="h-7 w-7 rounded-full bg-rose-100/50"></div>
+                      <div className="h-6 w-32 bg-rose-100/50 rounded"></div>
+                    </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="h-32 bg-white rounded-2xl border border-orange-100"></div>
+                      <div className="h-32 bg-white rounded-2xl border border-orange-100"></div>
+                    </div>
+                  </div>
+                ) : (
+                  <DeliveryMethod
+                    t={t}
+                    isFreeDelivery={isFreeDelivery}
+                    deliveryMethod={form.deliveryMethod}
+                    setForm={setForm}
+                    isDeliveryEnabled={isDeliveryEnabled}
+                  />
+                )}
+
+                {/* Promo Code section */}
+                <PromoCode 
+                  appliedCoupon={appliedCoupon} 
+                  setAppliedCoupon={setAppliedCoupon} 
+                  disabled={isRedirecting || totalCookiesCount === 0} 
+                />
+
+                {/* Checkout CTA block */}
+                <CheckoutCTA
+                  t={t}
+                  finalTotal={finalTotal}
+                  discountAmount={discountAmount}
+                  paymentAcknowledge={paymentAcknowledge}
+                  setPaymentAcknowledge={setPaymentAcknowledge}
+                  validationError={validationError}
+                  isRedirecting={isRedirecting}
+                  handleOrderSubmit={handleOrderSubmit}
+                  isCurrentlyPaused={isCurrentlyPaused}
+                />
+
+                {isRedirecting && (
+                  <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-6 text-center space-y-3 animate-pulse max-w-md mx-auto">
+                    <span className="text-3xl block">🍪✨</span>
+                    <h4 className="font-bold text-emerald-800 text-lg">{t('waRedirectTitle')}</h4>
+                    <p className="text-xs sm:text-sm text-emerald-700 leading-relaxed">
+                      {t('waRedirectDesc')}
+                    </p>
+                  </div>
+                )}
+              </form>
+            )}
           </div>
         </div>
       </section>
@@ -487,7 +674,7 @@ export default function App() {
               </span>
             </div>
             <p className="text-xs text-gray-400">
-              ┬® 2026 Velvet Crumbs. Handmade with love.
+              © 2026 Velvet Crumbs. Handmade with love.
             </p>
           </div>
 
