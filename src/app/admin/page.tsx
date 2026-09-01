@@ -77,6 +77,7 @@ export default function AdminPage() {
   });
 
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+  const [couponToDelete, setCouponToDelete] = useState<string | null>(null);
 
   const showToast = (message: string, type: 'success' | 'error') => {
     setToast({ message, type });
@@ -241,8 +242,10 @@ export default function AdminPage() {
     finally { setCouponsLoading(false); }
   };
 
-  const handleDeleteCoupon = async (code: string) => {
-    if (!confirm(`Delete coupon ${code}?`)) return;
+  const confirmDeleteCoupon = async () => {
+    if (!couponToDelete) return;
+    const code = couponToDelete;
+    setCouponToDelete(null);
     setCouponsLoading(true);
     try {
       const res = await fetch('/api/admin/coupons', {
@@ -300,7 +303,7 @@ export default function AdminPage() {
   // Show a full-screen loading spinner while checking authentication on mount
   if (initializing) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#FFF9F5] via-[#fff4ef] to-[#ffe8df] flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-10 w-10 text-[#F48B7D] animate-spin" />
       </div>
     );
@@ -405,7 +408,7 @@ export default function AdminPage() {
 
   // ── Admin Dashboard ──────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#FFF9F5] via-[#fff4ef] to-[#ffe8df]">
+    <>
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-orange-100 sticky top-0 z-40">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -814,7 +817,7 @@ export default function AdminPage() {
                             </button>
                           </td>
                           <td className="px-6 py-4 text-right">
-                            <button onClick={() => handleDeleteCoupon(coupon.code)} disabled={couponsLoading} className="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                            <button onClick={() => setCouponToDelete(coupon.code)} disabled={couponsLoading} title={`Delete ${coupon.code}`} className="p-2 text-red-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all cursor-pointer">
                               <Trash2 className="h-4 w-4" />
                             </button>
                           </td>
@@ -830,19 +833,40 @@ export default function AdminPage() {
 
       </main>
 
-      {/* Toast */}
-      {toast && (
-        <div className={`fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-5 py-3.5 rounded-2xl shadow-xl border text-sm font-bold animate-bounce ${
-          toast.type === 'success'
-            ? 'bg-emerald-50 border-emerald-100 text-emerald-800'
-            : 'bg-rose-50 border-rose-100 text-rose-800'
-        }`}>
-          {toast.type === 'success'
-            ? <CheckCircle className="h-4 w-4 text-emerald-500" />
-            : <XCircle className="h-4 w-4 text-rose-500" />}
-          <span>{toast.message}</span>
+      {/* Delete Coupon Confirmation Modal */}
+      {couponToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl border border-orange-100 shadow-2xl p-6 sm:p-8 max-w-sm w-full mx-auto text-center space-y-5 animate-in zoom-in-95 duration-150">
+            <div className="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center mx-auto text-rose-500 shadow-inner">
+              <Trash2 className="h-6 w-6" />
+            </div>
+            
+            <div className="space-y-1.5">
+              <h3 className="text-lg font-bold text-[#2D2D2D]">Delete Coupon?</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Are you sure you want to delete coupon <span className="font-mono font-bold text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded-md">{couponToDelete}</span>? Customers will no longer be able to use this promo code.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setCouponToDelete(null)}
+                className="w-full py-2.5 px-4 rounded-xl border border-gray-200 text-xs font-bold text-gray-600 hover:bg-gray-50 transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={confirmDeleteCoupon}
+                className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-500 to-red-600 text-white text-xs font-bold shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
+              >
+                Yes, Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

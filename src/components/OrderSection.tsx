@@ -115,11 +115,13 @@ export default function OrderSection({ lang, t }: OrderSectionProps) {
   const resumeStr = useMemo(() => {
     if (!resumeDateObj) return '';
     const datePart = resumeDateObj.toLocaleDateString(lang === 'fi' ? 'fi-FI' : 'en-US', {
+      timeZone: 'Europe/Helsinki',
       weekday: 'long',
       day: 'numeric',
       month: 'long'
     });
     const timePart = resumeDateObj.toLocaleTimeString(lang === 'fi' ? 'fi-FI' : 'en-US', {
+      timeZone: 'Europe/Helsinki',
       hour: 'numeric',
       minute: '2-digit',
       hour12: lang !== 'fi'

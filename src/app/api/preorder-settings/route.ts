@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import { cookies } from 'next/headers';
-import { put, list } from '@vercel/blob';
+import { getDb } from '@/lib/firebaseAdmin';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 const DEFAULT_SETTINGS = {
   isPaused: false,
@@ -14,34 +17,21 @@ const DEFAULT_SETTINGS = {
 
 async function readSettings() {
   try {
-    const { blobs } = await list({ prefix: 'preorder-settings.json' });
-    const settingsBlob = blobs.find((b) => b.pathname === 'preorder-settings.json');
-    if (settingsBlob) {
-      const res = await fetch(settingsBlob.url, { 
-        cache: 'no-store',
-        headers: {
-          'Authorization': `Bearer ${process.env.BLOB_READ_WRITE_TOKEN}`,
-        },
-      });
-      if (res.ok) {
-        const data = await res.json();
-        return { ...DEFAULT_SETTINGS, ...data };
-      }
+    const db = getDb();
+    const doc = await db.collection('settings').doc('preorder').get();
+    if (doc.exists) {
+      const data = doc.data();
+      return { ...DEFAULT_SETTINGS, ...data };
     }
   } catch (err) {
-    console.error('Failed to read settings from Vercel Blob:', err);
+    console.error('Failed to read settings from Firestore:', err);
   }
   return DEFAULT_SETTINGS;
 }
 
 async function writeSettings(data: typeof DEFAULT_SETTINGS) {
-  await put('preorder-settings.json', JSON.stringify(data, null, 2), {
-    access: 'private', // Match your store's private config
-    addRandomSuffix: false,
-    allowOverwrite: true, // Allow overwriting the existing file
-    contentType: 'application/json',
-    cacheControlMaxAge: 0, // Disable edge caching for live settings updates
-  });
+  const db = getDb();
+  await db.collection('settings').doc('preorder').set(data, { merge: true });
 }
 
 async function verifyAuth(req: NextRequest): Promise<boolean> {
@@ -49,18 +39,22 @@ async function verifyAuth(req: NextRequest): Promise<boolean> {
   if (!expectedSecret) return false;
 
   // 1. Check header (for scripting / API consumers)
-  const authHeader = req.headers.get('x-admin-secret');
+  const authHeader = req.headers.get('x-admin-secret') || req.headers.get('Authorization')?.replace(/^Bearer\s+/i, '');
   if (authHeader === expectedSecret) return true;
 
   // 2. Check HttpOnly cookie (for browser/admin panel)
-  const cookieStore = await cookies();
-  const sessionToken = cookieStore.get('velvet_admin_session')?.value;
-  if (sessionToken) {
-    const expectedToken = crypto
-      .createHmac('sha256', expectedSecret)
-      .update('velvet-session')
-      .digest('hex');
-    if (sessionToken === expectedToken) return true;
+  try {
+    const cookieStore = await cookies();
+    const sessionToken = cookieStore.get('velvet_admin_session')?.value;
+    if (sessionToken) {
+      const expectedToken = crypto
+        .createHmac('sha256', expectedSecret)
+        .update('velvet-session')
+        .digest('hex');
+      if (sessionToken === expectedToken) return true;
+    }
+  } catch {
+    // Cookie store read failure fallback
   }
 
   return false;
@@ -81,7 +75,9 @@ export async function GET(req: NextRequest) {
 
     const settings = await readSettings();
     return NextResponse.json(settings, {
-      headers: { 'Cache-Control': 'no-store, max-age=0' },
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+      },
     });
   } catch (err: any) {
     return NextResponse.json(
@@ -112,7 +108,12 @@ export async function POST(req: NextRequest) {
 
     await writeSettings(settings);
 
-    return NextResponse.json({ success: true, settings }, { status: 200 });
+    return NextResponse.json({ success: true, settings }, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+      },
+    });
   } catch (err: any) {
     console.error('❌ Failed to save preorder settings:', err);
     return NextResponse.json(
